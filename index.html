@@ -121,6 +121,7 @@
       background: rgba(6, 25, 38, 0.82);
       line-height: 1.55;
       font-weight: 800;
+      font-size: 1.05rem;
       z-index: 3;
       cursor: pointer;
       user-select: none;
@@ -139,19 +140,19 @@
       border-radius: 999px;
       background: rgba(255, 214, 93, 0.14);
       color: #fff1a0;
-      font-size: 0.82rem;
+      font-size: 0.9rem;
       font-weight: 900;
     }
 
     .story-text {
       min-height: 48px;
-      font-size: 0.98rem;
+      font-size: 1.08rem;
     }
 
     .story-next {
       margin-top: 6px;
       color: var(--muted);
-      font-size: 0.78rem;
+      font-size: 0.86rem;
       font-weight: 900;
       text-align: right;
     }
@@ -182,6 +183,7 @@
     }
 
     .unit.active { transform: translateY(-10px); filter: drop-shadow(0 0 12px rgba(255, 214, 93, 0.7)); }
+    .unit.targetable { cursor: pointer; filter: drop-shadow(0 0 14px rgba(255, 214, 93, 0.88)); }
     .unit.down { opacity: 0.48; filter: grayscale(0.7); }
     .unit.hidden { opacity: 0.28; filter: saturate(0.3) blur(1px); }
     .unit.hit { transform: translateX(-12px) scale(0.92); filter: brightness(1.9) saturate(1.25); }
@@ -284,6 +286,14 @@
     .rewind-overlay.show {
       display: grid;
       pointer-events: auto;
+    }
+
+    .rewind-overlay:not(.rewinding) .rewind-spiral {
+      display: none;
+    }
+
+    .rewind-overlay.rewinding .defeat-actions {
+      display: none;
     }
 
     .rewind-spiral {
@@ -653,7 +663,7 @@
 
     .hud {
       display: grid;
-      grid-template-columns: minmax(270px, 0.85fr) minmax(340px, 1.15fr);
+      grid-template-columns: 1fr;
       gap: 12px;
     }
 
@@ -666,12 +676,15 @@
     .roster {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      gap: 8px;
+      gap: 2px;
     }
 
     .card {
       min-width: 0;
-      padding: 8px;
+      display: grid;
+      grid-template-rows: auto auto auto;
+      gap: 3px;
+      padding: 8px 7px;
       border: 1px solid rgba(255, 247, 219, 0.42);
       border-radius: 7px;
       background: rgba(5, 21, 31, 0.52);
@@ -683,25 +696,30 @@
       box-shadow: inset 0 0 0 2px rgba(255, 214, 93, 0.35);
     }
 
+    .card.targetable {
+      border-color: #fff1a0;
+      box-shadow: inset 0 0 0 2px rgba(255, 214, 93, 0.32), 0 0 10px rgba(255, 214, 93, 0.24);
+    }
+
     .card strong {
       display: block;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       color: #fff2a9;
-      font-size: 0.86rem;
+      font-size: 1rem;
     }
 
     .role {
-      margin: 2px 0 7px;
+      margin: 2px 0 6px;
       color: var(--muted);
-      font-size: 0.72rem;
+      font-size: 0.82rem;
       font-weight: 800;
       white-space: nowrap;
     }
 
     .bar {
-      height: 11px;
+      height: 21px;
       overflow: hidden;
       border: 1px solid rgba(255,247,219,0.7);
       border-radius: 999px;
@@ -716,7 +734,11 @@
       transition: width 220ms ease;
     }
 
+    .fill.mid { background: linear-gradient(90deg, #ffd65d, #fff1a0); }
+    .fill.low { background: linear-gradient(90deg, #ef6b62, #ff9d91); }
     .mp .fill { background: linear-gradient(90deg, var(--blue), #bcefff); }
+    .mp .fill.mid { background: linear-gradient(90deg, #ffd65d, #fff1a0); }
+    .mp .fill.low { background: linear-gradient(90deg, #ef6b62, #ff9d91); }
 
     .command-panel {
       display: grid;
@@ -731,6 +753,7 @@
       align-items: center;
       justify-content: space-between;
       color: var(--muted);
+      font-size: 1.02rem;
       font-weight: 900;
     }
 
@@ -744,10 +767,12 @@
       display: grid;
       gap: 3px;
       text-align: left;
+      font-size: 1rem;
     }
 
     .skill small {
       color: #d1edf5;
+      font-size: 0.86rem;
       font-weight: 800;
       line-height: 1.25;
     }
@@ -763,6 +788,7 @@
     .dialog p {
       margin: 0;
       line-height: 1.6;
+      font-size: 1.05rem;
       font-weight: 800;
     }
 
@@ -907,37 +933,45 @@
       body.compact-battle .hud {
         display: grid;
         grid-template-columns: 1fr;
-        grid-template-rows: auto auto;
+        grid-template-rows: max-content minmax(0, 1fr);
         gap: 4px;
         min-height: 0;
-        overflow-y: auto;
+        overflow: hidden;
         overscroll-behavior: contain;
       }
 
       body.compact-battle .status-panel,
       body.compact-battle .command-panel {
-        padding: 5px;
+        padding: 3px;
         border-width: 2px;
         border-radius: 6px;
         min-height: 0;
         overflow: visible;
       }
 
+      body.compact-battle .status-panel {
+        display: block;
+      }
+
       body.compact-battle .roster {
-        grid-template-columns: 1fr;
-        gap: 3px;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 0;
         height: auto;
-        align-content: start;
+        align-content: stretch;
+        align-items: stretch;
       }
 
       body.compact-battle .card {
-        min-height: 36px;
-        padding: 4px 5px;
+        min-height: 32px;
+        height: auto;
+        padding: 2px 3px;
         border-radius: 5px;
+        grid-template-rows: auto auto auto;
+        gap: 1px;
       }
 
       body.compact-battle .card strong {
-        font-size: 0.72rem;
+        font-size: 0.6rem;
       }
 
       body.compact-battle .role {
@@ -945,7 +979,9 @@
       }
 
       body.compact-battle .bar {
-        height: 6px;
+        height: 7px;
+        min-height: 0;
+        border-radius: 999px;
       }
 
       body.compact-battle .command-panel {
@@ -965,25 +1001,27 @@
       }
 
       body.compact-battle .skills {
-        grid-template-columns: 1fr;
-        gap: 3px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 4px;
         min-height: 0;
         align-content: start;
       }
 
       body.compact-battle .skill {
         min-height: 38px;
-        padding: 5px 7px;
+        padding: 5px;
         gap: 1px;
       }
 
       body.compact-battle .skill span {
-        font-size: 0.76rem;
+        font-size: 0.66rem;
         line-height: 1.08;
       }
 
       body.compact-battle .skill small {
-        display: none;
+        display: block;
+        font-size: 0.58rem;
+        line-height: 1.15;
       }
 
       body.compact-battle .turn-banner {
@@ -1075,21 +1113,21 @@
 
     const skillBook = {
       nap: { name: "昼寝", cost: 0, text: "各戦闘1回 自分を全回復", once: true, use: () => fullRecoverSelf("nap", "のび太は一瞬で昼寝した。起きたらHPとMPが全回復。") },
-      ataruGun: { name: "アタールガン", cost: 0, text: "敵単体小ダメージ", use: () => hitEnemy(15, "のび太がアタールガンで狙い撃ちした。") },
-      nobitaAirCannon: { name: "空気砲", cost: 5, text: "敵全体小ダメージ", needs: "のび太の空気砲", use: () => attackAll(17, "のび太の空気砲がまとめて吹き飛ばした。") },
-      denkomaru: { name: "名刀電光丸", cost: 7, text: "敵単体大ダメージ+1ターン無敵", needs: "名刀電光丸", use: () => {
-        hitEnemy(42, "のび太が名刀電光丸で切り込んだ。");
+      ataruGun: { name: "アタールガン", cost: 0, text: "敵単体小ダメージ", target: "enemy", use: (target) => hitEnemy(15, "のび太がアタールガンで狙い撃ちした。", target) },
+      nobitaAirCannon: { name: "空気砲", cost: 5, text: "敵単体中ダメージ", needs: "のび太の空気砲", target: "enemy", use: (target) => hitEnemy(25, "のび太の空気砲が一点に空気弾を撃ち込んだ。", target) },
+      denkomaru: { name: "名刀電光丸", cost: 7, text: "敵単体大ダメージ+1ターン無敵", needs: "名刀電光丸", target: "enemy", use: (target) => {
+        hitEnemy(42, "のび太が名刀電光丸で切り込んだ。", target);
         state.invincibleTurns = 1;
         state.log += " さらに1ターン無敵になる。";
       } },
-      korobashiya: { name: "転ばし屋", cost: 0, text: "敵単体小ダメージ", use: () => hitEnemy(14, "ドラえもんが転ばし屋を走らせた。") },
-      anywhereDoor: { name: "どこでもドア", cost: 5, text: "味方1人が1ターン姿を隠す", use: () => hideOneAlly() },
+      korobashiya: { name: "転ばし屋", cost: 0, text: "敵単体小ダメージ", target: "enemy", use: (target) => hitEnemy(14, "ドラえもんが転ばし屋を走らせた。", target) },
+      anywhereDoor: { name: "どこでもドア", cost: 5, text: "味方1人が1ターン姿を隠す", target: "ally", use: (target) => hideOneAlly(target) },
       takecopter: { name: "タケコプター", cost: 4, text: "味方全体回避率30%アップ", use: () => {
         state.evasionBonus = Math.max(state.evasionBonus, 0.3);
         state.log = "タケコプターで全員が宙に浮いた。次の敵攻撃を避けやすくなる。";
       } },
-      gourmetCloth: { name: "グルメテーブル掛け", cost: 4, text: "味方単体小回復", use: () => healOne(24, "グルメテーブル掛けから温かいごはんが出た。") },
-      fourDPocket: { name: "四次元ポケット", cost: 0, text: "ほかの仲間の道具も使用可能", needs: "四次元ポケット", use: () => {
+      gourmetCloth: { name: "グルメテーブル掛け", cost: 4, text: "味方単体小回復", target: "ally", use: (target) => healOne(24, "グルメテーブル掛けから温かいごはんが出た。", target) },
+      fourDPocket: { name: "四次元ポケット", cost: 0, text: "常時効果: 仲間の秘密道具だけ使える", needs: "四次元ポケット", passive: true, use: () => {
         state.log = "四次元ポケットが開いた。ドラえもんは仲間の道具も取り出せる。";
       } },
       bigLight: { name: "ビックライト", cost: 8, text: "このターン味方全体のダメージ2倍", needs: "ビックライト", use: () => {
@@ -1100,8 +1138,8 @@
         state.enemyVulnerableTurns = 1;
         state.log = "スネ夫が金持ち自慢をした。敵全体がムキになって、このターン受けるダメージが2倍。";
       } },
-      hirariMantle: { name: "ヒラリマント", cost: 0, text: "小ダメージ+受けた半分を反撃", use: () => {
-        hitEnemy(12, "スネ夫がヒラリマントでかわしながら当てた。");
+      hirariMantle: { name: "ヒラリマント", cost: 0, text: "小ダメージ+受けた半分を反撃", target: "enemy", use: (target) => {
+        hitEnemy(12, "スネ夫がヒラリマントでかわしながら当てた。", target);
         state.counterHeroId = "suneta";
         state.counterRate = 0.5;
         state.log += " このターン、受けたダメージの半分を返す。";
@@ -1110,10 +1148,10 @@
         state.enemyAttackMultiplier = 0.5;
         state.log = "スモールライトで敵が小さくなった。次の敵攻撃力が半分。";
       } },
-      maamaaStick: { name: "まあまあ棒", cost: 20, text: "敵単体1ターン行動停止", needs: "まあまあ棒", use: () => stopEnemy() },
-      showerTime: { name: "シャワータイム", cost: 0, text: "各戦闘1回 味方単体を復活+全回復", once: true, use: () => reviveOneFull("showerTime") },
+      maamaaStick: { name: "まあまあ棒", cost: 20, text: "敵単体1ターン行動停止", needs: "まあまあ棒", target: "enemy", use: (target) => stopEnemy(target) },
+      showerTime: { name: "シャワータイム", cost: 0, text: "各戦闘1回 味方単体を復活+全回復", once: true, target: "reviveAlly", use: (target) => reviveOneFull("showerTime", target) },
       doctorBag: { name: "お医者さんカバン", cost: 8, text: "味方全体中回復", needs: "お医者さんカバン", use: () => healParty(24, "お医者さんカバンでみんなを手当てした。") },
-      cheerGlove: { name: "チアガール手ぶくろ", cost: 0, text: "味方単体MP10回復", use: () => restoreOneMp(10) },
+      cheerGlove: { name: "チアガール手ぶくろ", cost: 0, text: "味方単体MP10回復", target: "ally", use: (target) => restoreOneMp(10, target) },
       dressCamera: { name: "着せ替えカメラ", cost: 15, text: "味方全体3ターンダメージ50%カット", needs: "着せ替えカメラ", use: () => {
         state.damageCutTurns = 3;
         state.damageCutRate = 0.5;
@@ -1125,9 +1163,12 @@
         state.log = "ジャイアンがリサイタルを始めた。次の攻撃の威力が2倍になる。";
       } },
       koekatamarin: { name: "コエカタマリン", cost: 0, text: "敵全体15ダメージ", use: () => attackAll(15, "ジャイアンの声が固まって敵全体に飛んだ。") },
-      superGlove: { name: "スーパー手袋", cost: 6, text: "敵単体大ダメージ", needs: "スーパー手袋", use: () => hitEnemy(38, "ジャイアンがスーパー手袋で殴り飛ばした。") },
-      ultraDeluxePill: { name: "ウルトラスーパーデラックス錠", cost: 9, text: "敵単体極大ダメージ", needs: "ウルトラスーパーデラックス錠", use: () => hitEnemy(58, "ジャイアンがウルトラスーパーデラックス錠で限界突破した。") }
+      superGlove: { name: "スーパー手袋", cost: 6, text: "敵単体大ダメージ", needs: "スーパー手袋", target: "enemy", use: (target) => hitEnemy(38, "ジャイアンがスーパー手袋で殴り飛ばした。", target) },
+      ultraDeluxePill: { name: "ウルトラスーパーデラックス錠", cost: 9, text: "敵単体極大ダメージ", needs: "ウルトラスーパーデラックス錠", target: "enemy", use: (target) => hitEnemy(58, "ジャイアンがウルトラスーパーデラックス錠で限界突破した。", target) }
     };
+
+    const characterSkillIds = new Set(["nap", "richBoast", "showerTime", "recital"]);
+    const passiveSkillIds = new Set(["fourDPocket"]);
 
     const battlePlans = [
       { title: "第1戦 いじめられたのび太", scene: "assets/chapter-1-room-story.png", drop: "のび太の空気砲", enemies: [{ name: "暴走空気砲", hp: 72, atk: 14, color: "#ff884e", kind: "air" }] },
@@ -1210,6 +1251,7 @@
       counterRate: 0,
       onceUsed: {},
       actionCancelled: false,
+      pendingTarget: null,
       actedThisRound: [],
       defeatCount: 0,
       lastReward: "",
@@ -1248,6 +1290,7 @@
       state.guard = 0;
       resetTurnEffects();
       state.actedThisRound = [];
+      state.pendingTarget = null;
       resetBattleLimitedSkills();
       const rewardLine = state.lastReward;
       state.log = rewardLine ? `${rewardLine} ${chapter.log}` : chapter.log;
@@ -1274,6 +1317,7 @@
         state.phase = "battle";
         state.guard = 0;
         state.actedThisRound = [];
+        state.pendingTarget = null;
         state.log = `${aliveHero().name}の番。味方を切り替えて技を選ぼう。`;
         el.advance.textContent = "オート";
         el.story.innerHTML = `<span class="story-speaker">戦闘</span><div class="story-text">${chapters[state.chapter].title}</div><div class="story-next">下のコマンドで行動</div>`;
@@ -1281,6 +1325,11 @@
         return;
       }
       if (state.phase === "battle") {
+        if (state.pendingTarget) {
+          state.log = "先に技の対象を選んでください。";
+          render();
+          return;
+        }
         useSkill(effectiveSkillIds(heroes[state.active])[0]);
       }
     }
@@ -1337,7 +1386,11 @@
       if (hero.id === "cat" && state.recovered.includes("四次元ポケット")) {
         joinedHeroes()
           .filter((member) => member.id !== "cat")
-          .forEach((member) => ids.push(...member.skills));
+          .forEach((member) => {
+            member.skills
+              .filter((id) => !characterSkillIds.has(id) && !passiveSkillIds.has(id))
+              .forEach((id) => ids.push(id));
+          });
       }
       return [...new Set(ids)];
     }
@@ -1345,6 +1398,7 @@
     function useSkill(id) {
       if (state.phase !== "battle") return;
       const hero = aliveHero();
+      state.pendingTarget = null;
       if (state.actedThisRound.includes(hero.id)) {
         state.log = `${hero.name}はこのターンもう行動した。`;
         render();
@@ -1352,6 +1406,11 @@
       }
       const skill = skillBook[id];
       if (!skill || !skillAvailable(id)) return;
+      if (skill.passive) {
+        state.log = `${skill.name}は常時効果。コマンドとしては使わない。`;
+        render();
+        return;
+      }
       if (skill.once && state.onceUsed[id]) {
         state.log = "この特技はこの戦闘ではもう使えない。";
         render();
@@ -1362,10 +1421,61 @@
         render();
         return;
       }
+      if (skill.target) {
+        const candidates = targetCandidates(skill);
+        if (!candidates.length) {
+          state.log = `${skill.name}を使える対象がいない。`;
+          render();
+          return;
+        }
+        if (candidates.length > 1) {
+          state.pendingTarget = { skillId: id, heroIndex: state.active, type: skill.target };
+          state.log = `${skill.name}の対象を選んでください。`;
+          render();
+          return;
+        }
+        executeSkill(id, candidates[0]);
+        return;
+      }
+      executeSkill(id, null);
+    }
+
+    function executeSkill(id, target) {
+      if (state.phase !== "battle") return;
+      const pending = state.pendingTarget;
+      if (pending && pending.skillId === id) state.active = pending.heroIndex;
+      const hero = aliveHero();
+      const skill = skillBook[id];
+      if (!skill || !skillAvailable(id)) return;
+      if (skill.passive) {
+        state.pendingTarget = null;
+        state.log = `${skill.name}は常時効果。コマンドとしては使わない。`;
+        render();
+        return;
+      }
+      if (state.actedThisRound.includes(hero.id)) {
+        state.pendingTarget = null;
+        state.log = `${hero.name}はこのターンもう行動した。`;
+        render();
+        return;
+      }
+      if (skill.once && state.onceUsed[id]) {
+        state.pendingTarget = null;
+        state.log = "この特技はこの戦闘ではもう使えない。";
+        render();
+        return;
+      }
+      if (hero.mp < skill.cost) {
+        state.pendingTarget = null;
+        state.log = `${hero.name}はMPが足りない。`;
+        render();
+        return;
+      }
+      state.pendingTarget = null;
       hero.mp -= skill.cost;
       flashUnit(hero.id, "attack");
       state.actionCancelled = false;
-      skill.use();
+      skill.use(target);
       if (state.actionCancelled) {
         state.actionCancelled = false;
         render();
@@ -1384,6 +1494,37 @@
         selectNextPendingHero();
       }
       render();
+    }
+
+    function targetCandidates(skill) {
+      if (skill.target === "enemy") return state.enemies.filter((enemy) => enemy.hp > 0);
+      if (skill.target === "reviveAlly") {
+        return joinedHeroes().filter((hero) => hero.hp <= 0 || hero.hp < hero.maxHp || hero.mp < hero.maxMp);
+      }
+      if (skill.target === "ally") return joinedHeroes().filter((hero) => hero.hp > 0);
+      return [];
+    }
+
+    function candidateId(candidate) {
+      return candidate.id || candidate.name;
+    }
+
+    function selectTarget(type, index) {
+      const pending = state.pendingTarget;
+      if (!pending || state.phase !== "battle") return false;
+      const skill = skillBook[pending.skillId];
+      if (!skill) return false;
+      const normalizedType = pending.type === "reviveAlly" ? "ally" : pending.type;
+      if (type !== normalizedType) return false;
+      const candidates = targetCandidates(skill);
+      const target = type === "enemy" ? state.enemies[index] : heroes[index];
+      if (!target || !candidates.some((candidate) => candidateId(candidate) === candidateId(target))) {
+        state.log = "その対象には使えない。別の対象を選んでください。";
+        render();
+        return false;
+      }
+      executeSkill(pending.skillId, target);
+      return true;
     }
 
     function markActed(hero) {
@@ -1412,6 +1553,7 @@
 
     function startEnemyPhase() {
       if (state.phase !== "battle") return;
+      state.pendingTarget = null;
       if (!roundComplete()) {
         selectNextPendingHero();
         render();
@@ -1425,8 +1567,8 @@
       }, 650);
     }
 
-    function hitEnemy(base, text) {
-      const enemy = targetEnemy();
+    function hitEnemy(base, text, chosenEnemy) {
+      const enemy = chosenEnemy || targetEnemy();
       if (!enemy) return;
       const damage = Math.max(4, Math.floor((base + state.partyBuff + random(-3, 4)) * consumeDamageMultiplier()));
       enemy.hp -= damage;
@@ -1470,8 +1612,8 @@
       state.log = text;
     }
 
-    function healOne(amount, text) {
-      const target = joinedHeroes()
+    function healOne(amount, text, chosenHero) {
+      const target = chosenHero || joinedHeroes()
         .filter((hero) => hero.hp > 0 && hero.hp < hero.maxHp)
         .sort((a, b) => (a.hp / a.maxHp) - (b.hp / b.maxHp))[0];
       if (!target) {
@@ -1483,8 +1625,8 @@
       state.log = `${text} ${target.name}のHPが${amount}回復。`;
     }
 
-    function hideOneAlly() {
-      const target = joinedHeroes()
+    function hideOneAlly(chosenHero) {
+      const target = chosenHero || joinedHeroes()
         .filter((hero) => hero.hp > 0)
         .sort((a, b) => (a.hp / a.maxHp) - (b.hp / b.maxHp))[0];
       if (!target) {
@@ -1506,9 +1648,9 @@
       state.log = text;
     }
 
-    function reviveOneFull(skillId) {
+    function reviveOneFull(skillId, chosenHero) {
       if (!useOnce(skillId)) return;
-      const target = joinedHeroes()
+      const target = chosenHero || joinedHeroes()
         .filter((hero) => hero.hp <= 0)
         .sort((a, b) => b.maxHp - a.maxHp)[0]
         || joinedHeroes().filter((hero) => hero.hp > 0 && hero.hp < hero.maxHp).sort((a, b) => (a.hp / a.maxHp) - (b.hp / b.maxHp))[0];
@@ -1543,8 +1685,8 @@
       state.log = `のび太がデンチキャンディを使った。${target.name}のMPが${amount}回復。残り${state.mpItems}個。`;
     }
 
-    function restoreOneMpPercent(percent) {
-      const target = joinedHeroes()
+    function restoreOneMpPercent(percent, chosenHero) {
+      const target = chosenHero || joinedHeroes()
         .filter((hero) => hero.hp > 0 && hero.mp < hero.maxMp)
         .sort((a, b) => (a.mp / a.maxMp) - (b.mp / b.maxMp))[0];
       if (!target) {
@@ -1557,8 +1699,8 @@
       state.log = `チアガール手ぶくろで${target.name}を応援した。MPが${amount}回復。`;
     }
 
-    function restoreOneMp(amount) {
-      const target = joinedHeroes()
+    function restoreOneMp(amount, chosenHero) {
+      const target = chosenHero || joinedHeroes()
         .filter((hero) => hero.hp > 0 && hero.mp < hero.maxMp)
         .sort((a, b) => (a.mp / a.maxMp) - (b.mp / b.maxMp))[0];
       if (!target) {
@@ -1592,8 +1734,8 @@
       state.log = text;
     }
 
-    function stopEnemy() {
-      const enemy = targetEnemy();
+    function stopEnemy(chosenEnemy) {
+      const enemy = chosenEnemy || targetEnemy();
       if (!enemy) return;
       enemy.stopped = 1;
       flashUnit(enemy.name, "hit");
@@ -1709,6 +1851,7 @@
         return;
       } else {
         state.actedThisRound = [];
+        state.pendingTarget = null;
         state.active = heroes.findIndex((hero) => isJoined(hero) && hero.hp > 0);
         state.phase = "battle";
         state.log += " 味方のターン。";
@@ -1720,12 +1863,22 @@
       if (state.rewinding) return;
       state.rewinding = true;
       state.phase = "defeat";
+      state.pendingTarget = null;
       state.defeatCount += 1;
       state.log = "敗北・・・。最後の力を振り絞って、次の行き先を選ぼう。";
       el.log.textContent = state.log;
       el.defeatTitle.textContent = "敗北・・・";
       el.defeatText.innerHTML = `やられた回数: ${state.defeatCount}回<br />タイトルに戻るか、この戦闘をHP・MP全回復でやり直せる。`;
+      el.rewind.classList.remove("rewinding");
       el.rewind.classList.add("show");
+    }
+
+    function retryBattleWithTimeMachine() {
+      if (state.phase !== "defeat") return;
+      el.defeatTitle.textContent = "タイムマシン起動";
+      el.defeatText.innerHTML = "時間が巻き戻っている・・・";
+      el.rewind.classList.add("rewinding");
+      setTimeout(restartBattleFromTimeMachine, 1000);
     }
 
     function restartBattleFromTimeMachine() {
@@ -1740,6 +1893,7 @@
       state.guard = 0;
       resetTurnEffects();
       state.actedThisRound = [];
+      state.pendingTarget = null;
       resetBattleLimitedSkills();
       state.rewinding = false;
       state.phase = "battle";
@@ -1747,18 +1901,19 @@
       state.log = "この戦闘を最初からやり直す。HPとMPは満タン。";
       el.story.innerHTML = `<span class="story-speaker">再戦</span><div class="story-text">${chapter.title}を最初からやり直す。HPとMPは全回復。</div><div class="story-next">下のコマンドで再戦</div>`;
       el.advance.textContent = "オート";
-      el.rewind.classList.remove("show");
+      el.rewind.classList.remove("show", "rewinding");
       render();
     }
 
     function backToTitle() {
       state.rewinding = false;
-      el.rewind.classList.remove("show");
+      el.rewind.classList.remove("show", "rewinding");
       el.title.classList.remove("hidden");
       resetGame();
     }
 
     function victory() {
+      state.pendingTarget = null;
       const chapter = chapters[state.chapter];
       chapter.enemies.forEach((enemy) => {
         if (enemy.drop && !state.recovered.includes(enemy.drop)) state.recovered.push(enemy.drop);
@@ -1804,6 +1959,11 @@
 
     function switchHero() {
       if (state.phase !== "battle") return;
+      if (state.pendingTarget) {
+        state.log = "先に技の対象を選んでください。";
+        render();
+        return;
+      }
       if (!selectNextPendingHero()) {
         state.log = "行動できる味方は全員動いた。ターン終了。";
         startEnemyPhase();
@@ -1837,9 +1997,13 @@
       el.party.innerHTML = heroes.filter((hero) => isJoined(hero)).map((hero, index) => {
         const heroIndex = heroes.indexOf(hero);
         const style = hero.shirt ? `style="--shirt:${hero.shirt}"` : "";
-        const cls = ["unit", hero.cat ? "cat" : "person", heroIndex === state.active && state.phase === "battle" ? "active" : "", hero.id === state.hiddenHeroId ? "hidden" : "", hero.hp <= 0 ? "down" : ""].join(" ");
-        return `<div class="${cls}" data-unit="${hero.id}" ${style}>${heroAvatar(hero)}<div class="nameplate">${hero.name}</div></div>`;
+        const allyTargetable = isTargetableHero(hero);
+        const cls = ["unit", hero.cat ? "cat" : "person", heroIndex === state.active && state.phase === "battle" ? "active" : "", hero.id === state.hiddenHeroId ? "hidden" : "", hero.hp <= 0 ? "down" : "", allyTargetable ? "targetable" : ""].join(" ");
+        return `<div class="${cls}" data-unit="${hero.id}" ${allyTargetable ? `data-ally-target="${heroIndex}"` : ""} ${style}>${heroAvatar(hero)}<div class="nameplate">${hero.name}</div></div>`;
       }).join("");
+      document.querySelectorAll("[data-ally-target]").forEach((node) => {
+        node.addEventListener("click", () => selectTarget("ally", Number(node.dataset.allyTarget)));
+      });
     }
 
     function heroAvatar(hero) {
@@ -1854,18 +2018,23 @@
         return;
       }
       el.enemy.innerHTML = state.enemies.map((enemy) => {
+        const index = state.enemies.indexOf(enemy);
         const hp = Math.max(0, enemy.hp);
         const hpWidth = Math.max(0, Math.min(100, hp / enemy.maxHp * 100));
         const hpBar = `<div class="enemy-hp"><div class="enemy-hp-fill" style="width:${hpWidth}%"></div><span class="enemy-hp-text">${hp}/${enemy.maxHp}</span></div>`;
+        const enemyTargetable = isTargetableEnemy(enemy);
         if (enemy.heroId) {
           const hero = heroes.find((member) => member.id === enemy.heroId);
-          const cls = ["unit", hero?.cat ? "cat" : "person", enemy.hp <= 0 ? "down" : ""].join(" ");
+          const cls = ["unit", hero?.cat ? "cat" : "person", enemy.hp <= 0 ? "down" : "", enemyTargetable ? "targetable" : ""].join(" ");
           const style = hero?.shirt ? `style="--shirt:${hero.shirt}"` : "";
-          return `<div class="${cls}" data-unit="${enemy.name}" ${style}>${hpBar}${heroAvatar(hero || {})}<div class="nameplate">${enemy.name}</div></div>`;
+          return `<div class="${cls}" data-unit="${enemy.name}" ${enemyTargetable ? `data-enemy-target="${index}"` : ""} ${style}>${hpBar}${heroAvatar(hero || {})}<div class="nameplate">${enemy.name}</div></div>`;
         }
-        const cls = ["unit", "gadget", enemy.boss ? "boss" : "", enemy.hp <= 0 ? "down" : ""].join(" ");
-        return `<div class="${cls}" data-unit="${enemy.name}" style="--gadget:${enemy.color}">${hpBar}<div class="avatar gadget-art ${enemy.kind || "air"}">${gadgetMarkup(enemy.kind)}</div><div class="nameplate">${enemy.name}</div></div>`;
+        const cls = ["unit", "gadget", enemy.boss ? "boss" : "", enemy.hp <= 0 ? "down" : "", enemyTargetable ? "targetable" : ""].join(" ");
+        return `<div class="${cls}" data-unit="${enemy.name}" ${enemyTargetable ? `data-enemy-target="${index}"` : ""} style="--gadget:${enemy.color}">${hpBar}<div class="avatar gadget-art ${enemy.kind || "air"}">${gadgetMarkup(enemy.kind)}</div><div class="nameplate">${enemy.name}</div></div>`;
       }).join("");
+      document.querySelectorAll("[data-enemy-target]").forEach((node) => {
+        node.addEventListener("click", () => selectTarget("enemy", Number(node.dataset.enemyTarget)));
+      });
     }
 
     function gadgetMarkup(kind) {
@@ -1882,28 +2051,54 @@
     }
 
     function renderRoster() {
-      el.roster.innerHTML = heroes.filter((hero) => isJoined(hero)).map((hero) => {
+      el.roster.innerHTML = heroes.map((hero) => {
         const index = heroes.indexOf(hero);
-        const hpWidth = Math.max(0, hero.hp / hero.maxHp * 100);
-        const mpWidth = Math.max(0, hero.mp / hero.maxMp * 100);
+        const joined = isJoined(hero);
+        const hpRatio = joined ? Math.max(0, hero.hp / hero.maxHp) : 0;
+        const mpRatio = joined ? Math.max(0, hero.mp / hero.maxMp) : 0;
+        const hpWidth = hpRatio * 100;
+        const mpWidth = mpRatio * 100;
         const acted = state.actedThisRound.includes(hero.id);
-        const disabled = state.phase !== "battle" || hero.hp <= 0 || acted;
-        return `<button class="card ${index === state.active ? "selected" : ""}" data-hero="${index}" ${disabled ? "disabled" : ""}>
+        const targetable = isTargetableHero(hero);
+        const disabled = !targetable && (!joined || state.phase !== "battle" || hero.hp <= 0 || acted);
+        return `<button class="card ${index === state.active ? "selected" : ""} ${targetable ? "targetable" : ""}" data-hero="${index}" ${disabled ? "disabled" : ""}>
           <strong>${hero.name}</strong>
-          <div class="role">${acted ? "行動済み" : hero.role}</div>
-          <div class="bar"><div class="fill" style="width:${hpWidth}%"></div></div>
-          <div class="bar mp"><div class="fill" style="width:${mpWidth}%"></div></div>
+          <div class="role">${joined ? (acted ? "行動済み" : hero.role) : "未加入"}</div>
+          <div class="bar"><div class="fill ${joined ? barTone(hpRatio) : ""}" style="width:${hpWidth}%"></div></div>
+          <div class="bar mp"><div class="fill ${joined ? barTone(mpRatio) : ""}" style="width:${mpWidth}%"></div></div>
         </button>`;
       }).join("");
       document.querySelectorAll("[data-hero]").forEach((button) => {
         button.addEventListener("click", () => {
           const next = Number(button.dataset.hero);
+          if (state.pendingTarget) {
+            selectTarget("ally", next);
+            return;
+          }
           if (!canAct(heroes[next])) return;
           state.active = next;
           state.log = `行動順を変えた。次は${heroes[state.active].name}。`;
           render();
         });
       });
+    }
+
+    function barTone(ratio) {
+      if (ratio <= 0.25) return "low";
+      if (ratio <= 0.5) return "mid";
+      return "";
+    }
+
+    function isTargetableEnemy(enemy) {
+      if (!state.pendingTarget) return false;
+      const skill = skillBook[state.pendingTarget.skillId];
+      return state.pendingTarget.type === "enemy" && targetCandidates(skill).includes(enemy);
+    }
+
+    function isTargetableHero(hero) {
+      if (!state.pendingTarget) return false;
+      const skill = skillBook[state.pendingTarget.skillId];
+      return ["ally", "reviveAlly"].includes(state.pendingTarget.type) && targetCandidates(skill).includes(hero);
     }
 
     function renderSkills() {
@@ -1913,8 +2108,8 @@
         const available = skillAvailable(id);
         const acted = state.actedThisRound.includes(hero.id);
         const usedOnce = skill.once && state.onceUsed[id];
-        const disabled = state.phase !== "battle" || hero.hp <= 0 || hero.mp < skill.cost || !available || acted || usedOnce;
-        const lock = available ? (usedOnce ? "使用済み" : "") : "未回収";
+        const disabled = skill.passive || !!state.pendingTarget || state.phase !== "battle" || hero.hp <= 0 || hero.mp < skill.cost || !available || acted || usedOnce;
+        const lock = skill.passive && available ? skill.text : (available ? (usedOnce ? "使用済み" : "") : "未回収");
         const borrowed = hero.id === "cat" && !hero.skills.includes(id) ? " / 借り道具" : "";
         const detail = `${skill.text}${borrowed}`;
         return `<button class="skill" data-skill="${id}" ${disabled ? "disabled" : ""}>
@@ -1972,11 +2167,12 @@
       state.mpItems = 3;
       state.defeatCount = 0;
       state.actedThisRound = [];
+      state.pendingTarget = null;
       state.lastReward = "";
       state.guard = 0;
       resetTurnEffects();
       state.rewinding = false;
-      el.rewind.classList.remove("show");
+      el.rewind.classList.remove("show", "rewinding");
       state.ended = false;
       startChapter();
     }
@@ -1985,7 +2181,7 @@
       el.title.classList.add("hidden");
     });
     document.getElementById("nextBtn").addEventListener("click", switchHero);
-    el.retry.addEventListener("click", restartBattleFromTimeMachine);
+    el.retry.addEventListener("click", retryBattleWithTimeMachine);
     el.titleBack.addEventListener("click", backToTitle);
     el.advance.addEventListener("click", beginBattle);
     el.story.addEventListener("click", advanceStory);
