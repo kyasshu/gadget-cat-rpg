@@ -866,7 +866,7 @@
       },
       {
         id: "cat", name: "ドラえもん", role: "万能・回復", cat: true, hp: 42, maxHp: 42, mp: 22, maxMp: 22, joinAt: 0,
-        skills: ["doraAirCannon", "anywhereDoor", "takecopter", "gourmetCloth", "fourDPocket", "bigLight"]
+        skills: ["korobashiya", "anywhereDoor", "takecopter", "gourmetCloth", "fourDPocket", "bigLight"]
       },
       {
         id: "suneta", name: "スネ夫", role: "妨害・反撃", shirt: "#64b6e8", hp: 32, maxHp: 32, mp: 12, maxMp: 12, joinAt: 2,
@@ -874,7 +874,7 @@
       },
       {
         id: "shizumi", name: "静香", role: "回復・MP補助", shirt: "#f08cb4", hp: 30, maxHp: 30, mp: 18, maxMp: 18, joinAt: 4,
-        skills: ["bashoFan", "doctorBag", "cheerGlove"]
+        skills: ["cheerGlove", "doctorBag", "dressCamera"]
       },
       {
         id: "gouta", name: "ジャイアン", role: "全体火力", shirt: "#e0664d", hp: 48, maxHp: 48, mp: 12, maxMp: 12, joinAt: 6,
@@ -884,13 +884,13 @@
 
     const skillBook = {
       ataruGun: { name: "アタールガン", cost: 0, text: "敵単体小ダメージ", use: () => hitEnemy(15, "のび太がアタールガンで狙い撃ちした。") },
-      nobitaAirCannon: { name: "空気砲", cost: 5, text: "敵全体大ダメージ", needs: "のび太の空気砲", use: () => attackAll(28, "のび太の空気砲がまとめて吹き飛ばした。") },
-      denkomaru: { name: "名刀電光丸", cost: 7, text: "敵単体大ダメージ+そのターンダメージ無効", needs: "名刀電光丸", use: () => {
+      nobitaAirCannon: { name: "空気砲", cost: 5, text: "敵全体中ダメージ", needs: "のび太の空気砲", use: () => attackAll(22, "のび太の空気砲がまとめて吹き飛ばした。") },
+      denkomaru: { name: "名刀電光丸", cost: 7, text: "敵単体大ダメージ+1ターン無敵", needs: "名刀電光丸", use: () => {
         hitEnemy(42, "のび太が名刀電光丸で切り込んだ。");
         state.invincibleTurns = 1;
-        state.log += " さらにそのターンのダメージを無効にする。";
+        state.log += " さらに1ターン無敵になる。";
       } },
-      doraAirCannon: { name: "空気砲", cost: 0, text: "敵単体小ダメージ", use: () => hitEnemy(14, "ドラえもんの空気砲が命中した。") },
+      korobashiya: { name: "転ばし屋", cost: 0, text: "敵単体小ダメージ", use: () => hitEnemy(14, "ドラえもんが転ばし屋を走らせた。") },
       anywhereDoor: { name: "どこでもドア", cost: 5, text: "1ターンダメージ無効", use: () => {
         state.invincibleTurns = 1;
         state.log = "ドラえもんがどこでもドアを開いた。敵の攻撃ターンをやり過ごせる。";
@@ -903,9 +903,9 @@
       fourDPocket: { name: "四次元ポケット", cost: 0, text: "ほかの仲間の道具も使用可能", needs: "四次元ポケット", use: () => {
         state.log = "四次元ポケットが開いた。ドラえもんは仲間の道具も取り出せる。";
       } },
-      bigLight: { name: "ビックライト", cost: 8, text: "次の味方ダメージ2倍", needs: "ビックライト", use: () => {
+      bigLight: { name: "ビックライト", cost: 8, text: "このターン味方全体のダメージ2倍", needs: "ビックライト", use: () => {
         state.doubleDamageTurns = 1;
-        state.log = "ビックライトでみんなの攻撃が巨大化する。次のダメージ技が2倍。";
+        state.log = "ビックライトでみんなの攻撃が巨大化する。このターンの味方ダメージが2倍。";
       } },
       hirariMantle: { name: "ヒラリマント", cost: 0, text: "小ダメージ+受けた半分を反撃", use: () => {
         hitEnemy(12, "スネ夫がヒラリマントでかわしながら当てた。");
@@ -918,9 +918,13 @@
         state.log = "スモールライトで敵が小さくなった。次の敵攻撃力が半分。";
       } },
       maamaaStick: { name: "まあまあ棒", cost: 6, text: "敵単体1ターン行動停止", needs: "まあまあ棒", use: () => stopEnemy() },
-      bashoFan: { name: "バショー扇", cost: 0, text: "敵全体小ダメージ", use: () => attackAll(12, "静香がバショー扇で風を起こした。") },
       doctorBag: { name: "お医者さんカバン", cost: 8, text: "味方全体中回復", needs: "お医者さんカバン", use: () => healParty(24, "お医者さんカバンでみんなを手当てした。") },
-      cheerGlove: { name: "チアガール手ぶくろ", cost: 0, text: "味方単体MP30%回復", needs: "チアガール手ぶくろ", use: () => restoreOneMpPercent(0.3) },
+      cheerGlove: { name: "チアガール手ぶくろ", cost: 0, text: "味方単体MP30%回復", use: () => restoreOneMpPercent(0.3) },
+      dressCamera: { name: "着せ替えカメラ", cost: 7, text: "味方全体3ターンダメージ50%カット", needs: "着せ替えカメラ", use: () => {
+        state.damageCutTurns = 3;
+        state.damageCutRate = 0.5;
+        state.log = "着せ替えカメラで守りの衣装にチェンジ。3ターン、受けるダメージを50%カット。";
+      } },
       koekatamarin: { name: "コエカタマリン", cost: 5, text: "敵全体中ダメージ", use: () => attackAll(21, "ジャイアンの声が固まって敵全体に飛んだ。") },
       superGlove: { name: "スーパー手袋", cost: 6, text: "敵単体大ダメージ", needs: "スーパー手袋", use: () => hitEnemy(38, "ジャイアンがスーパー手袋で殴り飛ばした。") },
       ultraDeluxePill: { name: "ウルトラスーパーデラックス錠", cost: 9, text: "敵単体極大ダメージ", needs: "ウルトラスーパーデラックス錠", use: () => hitEnemy(58, "ジャイアンがウルトラスーパーデラックス錠で限界突破した。") }
@@ -934,7 +938,7 @@
       { title: "第5戦 スーパー手袋", join: "静香が仲間に加わった。", drop: "スーパー手袋", enemies: [{ name: "スーパー手袋", hp: 102, atk: 18, color: "#e46255", kind: "air" }] },
       { title: "第6戦 ビックライト", drop: "ビックライト", enemies: [{ name: "ビックライト", hp: 92, atk: 17, color: "#ffcd5a", kind: "speaker" }, { name: "巨大化ランプ", hp: 60, atk: 12, color: "#ffb24e", kind: "speaker" }] },
       { title: "第7戦 まあまあ棒", join: "ジャイアンが仲間に加わった。", drop: "まあまあ棒", enemies: [{ name: "まあまあ棒", hp: 110, atk: 18, color: "#b993ff", kind: "note" }] },
-      { title: "第8戦 チアガール手ぶくろ", drop: "チアガール手ぶくろ", enemies: [{ name: "チアガール手ぶくろ", hp: 88, atk: 15, color: "#f08cb4", kind: "speaker" }, { name: "応援ポンポン", hp: 74, atk: 13, color: "#ffcd5a", kind: "speaker" }] },
+      { title: "第8戦 着せ替えカメラ", drop: "着せ替えカメラ", enemies: [{ name: "着せ替えカメラ", hp: 88, atk: 15, color: "#f08cb4", kind: "speaker" }, { name: "まぶしいフラッシュ", hp: 74, atk: 13, color: "#ffcd5a", kind: "speaker" }] },
       { title: "第9戦 名刀電光丸", drop: "名刀電光丸", enemies: [{ name: "名刀電光丸", hp: 124, atk: 20, color: "#65e2ff", kind: "note" }] },
       { title: "第10戦 ウルトラスーパーデラックス錠", drop: "ウルトラスーパーデラックス錠", enemies: [{ name: "ウルトラスーパーデラックス錠", hp: 96, atk: 17, color: "#aef8ef", kind: "mist" }, { name: "デラックスカプセル", hp: 76, atk: 14, color: "#d7f6ff", kind: "mist" }] },
       { title: "第11戦 どこでもドア", enemies: [{ name: "どこでもドア", hp: 122, atk: 20, color: "#47b8ec", kind: "mirror" }] },
@@ -982,6 +986,8 @@
       invincibleTurns: 0,
       evasionBonus: 0,
       doubleDamageTurns: 0,
+      damageCutTurns: 0,
+      damageCutRate: 0,
       enemyAttackMultiplier: 1,
       counterHeroId: null,
       counterRate: 0,
@@ -1313,15 +1319,15 @@
     }
 
     function consumeDamageMultiplier() {
-      if (state.doubleDamageTurns <= 0) return 1;
-      state.doubleDamageTurns -= 1;
-      return 2;
+      return state.doubleDamageTurns > 0 ? 2 : 1;
     }
 
     function resetTurnEffects() {
       state.invincibleTurns = 0;
       state.evasionBonus = 0;
       state.doubleDamageTurns = 0;
+      state.damageCutTurns = 0;
+      state.damageCutRate = 0;
       state.enemyAttackMultiplier = 1;
       state.counterHeroId = null;
       state.counterRate = 0;
@@ -1360,9 +1366,11 @@
           popupUnit(target.id, "回避", "heal");
           continue;
         }
-        const damage = Math.max(3, Math.floor((enemy.atk - state.enemyDebuff - state.guard + random(-2, 3)) * state.enemyAttackMultiplier));
+        const cut = state.damageCutTurns > 0 ? (1 - state.damageCutRate) : 1;
+        const damage = Math.max(3, Math.floor((enemy.atk - state.enemyDebuff - state.guard + random(-2, 3)) * state.enemyAttackMultiplier * cut));
         target.hp -= damage;
         state.log = `${enemy.name}の逆襲。${target.name}に${damage}ダメージ。`;
+        if (state.damageCutTurns > 0) state.log += " 着せ替えカメラで軽減。";
         flashUnit(target.id, "hit");
         popupUnit(target.id, damage, "bad");
         if (target.id === state.counterHeroId && state.counterRate > 0) {
@@ -1375,6 +1383,11 @@
       }
       state.invincibleTurns = 0;
       state.evasionBonus = 0;
+      state.doubleDamageTurns = 0;
+      if (state.damageCutTurns > 0) {
+        state.damageCutTurns -= 1;
+        if (state.damageCutTurns <= 0) state.damageCutRate = 0;
+      }
       state.enemyAttackMultiplier = 1;
       state.counterHeroId = null;
       state.counterRate = 0;
