@@ -183,6 +183,7 @@
 
     .unit.active { transform: translateY(-10px); filter: drop-shadow(0 0 12px rgba(255, 214, 93, 0.7)); }
     .unit.down { opacity: 0.48; filter: grayscale(0.7); }
+    .unit.hidden { opacity: 0.28; filter: saturate(0.3) blur(1px); }
     .unit.hit { transform: translateX(-12px) scale(0.92); filter: brightness(1.9) saturate(1.25); }
     .unit.attack { transform: translateY(-18px) scale(1.12); filter: drop-shadow(0 0 18px rgba(255, 241, 160, 0.85)); }
 
@@ -351,6 +352,35 @@
       font-weight: 900;
       text-align: center;
       white-space: nowrap;
+    }
+
+    .enemy-hp {
+      width: min(88px, 100%);
+      height: 13px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 247, 219, 0.82);
+      border-radius: 999px;
+      background: rgba(7, 20, 28, 0.92);
+      box-shadow: 0 2px 0 rgba(0,0,0,0.38);
+    }
+
+    .enemy-hp-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #ef6b62, #ffd65d);
+    }
+
+    .enemy-hp-text {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: #fff7db;
+      font-size: 0.56rem;
+      font-weight: 900;
+      line-height: 1;
+      text-shadow: 0 1px 0 rgba(0,0,0,0.82);
     }
 
     .avatar {
@@ -801,6 +831,167 @@
       .nameplate { font-size: 0.66rem; padding-inline: 4px; }
       .roster { grid-template-columns: 1fr; }
     }
+
+    @media (max-width: 860px), (max-height: 720px) {
+      body.compact-battle {
+        overflow: hidden;
+      }
+
+      body.compact-battle .shell {
+        height: 100dvh;
+        min-height: 100dvh;
+        padding: 4px;
+        gap: 4px;
+        grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+      }
+
+      body.compact-battle header.box,
+      body.compact-battle .story-strip,
+      body.compact-battle .dialog {
+        display: none;
+      }
+
+      body.compact-battle .arena {
+        min-height: 0;
+        border-width: 2px;
+        border-radius: 6px;
+        box-shadow: inset 0 0 0 2px rgba(255, 247, 219, 0.64);
+      }
+
+      body.compact-battle .enemy-field {
+        top: 8%;
+        gap: 5px;
+        padding: 0 4px;
+      }
+
+      body.compact-battle .party-field {
+        bottom: 3%;
+        left: 50%;
+        right: auto;
+        width: min(150px, 42%);
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        justify-items: center;
+        align-items: end;
+        gap: 6px 8px;
+        padding: 0 4px;
+        transform: translateX(-50%);
+      }
+
+      body.compact-battle .unit {
+        width: min(100%, 72px);
+        min-width: 54px;
+        gap: 2px;
+      }
+
+      body.compact-battle .avatar {
+        width: clamp(48px, 15vw, 68px);
+      }
+
+      body.compact-battle .nameplate {
+        max-width: 72px;
+        padding: 1px 3px;
+        border-width: 1px;
+        font-size: 0.56rem;
+      }
+
+      body.compact-battle .enemy-hp {
+        width: min(72px, 100%);
+        height: 10px;
+      }
+
+      body.compact-battle .enemy-hp-text {
+        font-size: 0.48rem;
+      }
+
+      body.compact-battle .hud {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+        gap: 4px;
+        min-height: 0;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+      }
+
+      body.compact-battle .status-panel,
+      body.compact-battle .command-panel {
+        padding: 5px;
+        border-width: 2px;
+        border-radius: 6px;
+        min-height: 0;
+        overflow: visible;
+      }
+
+      body.compact-battle .roster {
+        grid-template-columns: 1fr;
+        gap: 3px;
+        height: auto;
+        align-content: start;
+      }
+
+      body.compact-battle .card {
+        min-height: 36px;
+        padding: 4px 5px;
+        border-radius: 5px;
+      }
+
+      body.compact-battle .card strong {
+        font-size: 0.72rem;
+      }
+
+      body.compact-battle .role {
+        display: none;
+      }
+
+      body.compact-battle .bar {
+        height: 6px;
+      }
+
+      body.compact-battle .command-panel {
+        gap: 3px;
+        grid-template-rows: auto auto;
+      }
+
+      body.compact-battle .turnline {
+        gap: 4px;
+        font-size: 0.72rem;
+      }
+
+      body.compact-battle .turnline button {
+        min-height: 30px;
+        padding: 4px 7px;
+        font-size: 0.7rem;
+      }
+
+      body.compact-battle .skills {
+        grid-template-columns: 1fr;
+        gap: 3px;
+        min-height: 0;
+        align-content: start;
+      }
+
+      body.compact-battle .skill {
+        min-height: 38px;
+        padding: 5px 7px;
+        gap: 1px;
+      }
+
+      body.compact-battle .skill span {
+        font-size: 0.76rem;
+        line-height: 1.08;
+      }
+
+      body.compact-battle .skill small {
+        display: none;
+      }
+
+      body.compact-battle .turn-banner {
+        min-width: min(240px, calc(100% - 24px));
+        padding: 8px 10px;
+        font-size: 1rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -861,51 +1052,53 @@
   <script>
     const heroes = [
       {
-        id: "nobio", name: "のび太", role: "射撃", shirt: "#f1cf41", hp: 34, maxHp: 34, mp: 10, maxMp: 10, joinAt: 0,
-        skills: ["ataruGun", "nobitaAirCannon", "denkomaru"]
+        id: "nobio", name: "のび太", role: "射撃", shirt: "#f1cf41", hp: 34, maxHp: 34, mp: 30, maxMp: 30, joinAt: 0,
+        skills: ["nap", "ataruGun", "nobitaAirCannon", "denkomaru"]
       },
       {
-        id: "cat", name: "ドラえもん", role: "万能・回復", cat: true, hp: 42, maxHp: 42, mp: 22, maxMp: 22, joinAt: 0,
+        id: "cat", name: "ドラえもん", role: "万能・回復", cat: true, hp: 42, maxHp: 42, mp: 30, maxMp: 30, joinAt: 0,
         skills: ["korobashiya", "anywhereDoor", "takecopter", "gourmetCloth", "fourDPocket", "bigLight"]
       },
       {
-        id: "suneta", name: "スネ夫", role: "妨害・反撃", shirt: "#64b6e8", hp: 32, maxHp: 32, mp: 12, maxMp: 12, joinAt: 2,
-        skills: ["hirariMantle", "smallLight", "maamaaStick"]
+        id: "suneta", name: "スネ夫", role: "妨害・反撃", shirt: "#64b6e8", hp: 32, maxHp: 32, mp: 30, maxMp: 30, joinAt: 3,
+        skills: ["richBoast", "hirariMantle", "smallLight", "maamaaStick"]
       },
       {
-        id: "shizumi", name: "静香", role: "回復・MP補助", shirt: "#f08cb4", hp: 30, maxHp: 30, mp: 18, maxMp: 18, joinAt: 4,
-        skills: ["cheerGlove", "doctorBag", "dressCamera"]
+        id: "shizumi", name: "静香", role: "回復・MP補助", shirt: "#f08cb4", hp: 30, maxHp: 30, mp: 30, maxMp: 30, joinAt: 5,
+        skills: ["showerTime", "cheerGlove", "doctorBag", "dressCamera"]
       },
       {
-        id: "gouta", name: "ジャイアン", role: "全体火力", shirt: "#e0664d", hp: 48, maxHp: 48, mp: 12, maxMp: 12, joinAt: 6,
-        skills: ["koekatamarin", "superGlove", "ultraDeluxePill"]
+        id: "gouta", name: "ジャイアン", role: "全体火力", shirt: "#e0664d", hp: 48, maxHp: 48, mp: 30, maxMp: 30, joinAt: 7,
+        skills: ["recital", "koekatamarin", "superGlove", "ultraDeluxePill"]
       }
     ];
 
     const skillBook = {
+      nap: { name: "昼寝", cost: 0, text: "各戦闘1回 自分を全回復", once: true, use: () => fullRecoverSelf("nap", "のび太は一瞬で昼寝した。起きたらHPとMPが全回復。") },
       ataruGun: { name: "アタールガン", cost: 0, text: "敵単体小ダメージ", use: () => hitEnemy(15, "のび太がアタールガンで狙い撃ちした。") },
-      nobitaAirCannon: { name: "空気砲", cost: 5, text: "敵全体中ダメージ", needs: "のび太の空気砲", use: () => attackAll(22, "のび太の空気砲がまとめて吹き飛ばした。") },
+      nobitaAirCannon: { name: "空気砲", cost: 5, text: "敵全体小ダメージ", needs: "のび太の空気砲", use: () => attackAll(17, "のび太の空気砲がまとめて吹き飛ばした。") },
       denkomaru: { name: "名刀電光丸", cost: 7, text: "敵単体大ダメージ+1ターン無敵", needs: "名刀電光丸", use: () => {
         hitEnemy(42, "のび太が名刀電光丸で切り込んだ。");
         state.invincibleTurns = 1;
         state.log += " さらに1ターン無敵になる。";
       } },
       korobashiya: { name: "転ばし屋", cost: 0, text: "敵単体小ダメージ", use: () => hitEnemy(14, "ドラえもんが転ばし屋を走らせた。") },
-      anywhereDoor: { name: "どこでもドア", cost: 5, text: "1ターンダメージ無効", use: () => {
-        state.invincibleTurns = 1;
-        state.log = "ドラえもんがどこでもドアを開いた。敵の攻撃ターンをやり過ごせる。";
-      } },
+      anywhereDoor: { name: "どこでもドア", cost: 5, text: "味方1人が1ターン姿を隠す", use: () => hideOneAlly() },
       takecopter: { name: "タケコプター", cost: 4, text: "味方全体回避率30%アップ", use: () => {
         state.evasionBonus = Math.max(state.evasionBonus, 0.3);
         state.log = "タケコプターで全員が宙に浮いた。次の敵攻撃を避けやすくなる。";
       } },
-      gourmetCloth: { name: "グルメテーブル掛け", cost: 4, text: "味方単体小回復", use: () => healOne(18, "グルメテーブル掛けから温かいごはんが出た。") },
+      gourmetCloth: { name: "グルメテーブル掛け", cost: 4, text: "味方単体小回復", use: () => healOne(24, "グルメテーブル掛けから温かいごはんが出た。") },
       fourDPocket: { name: "四次元ポケット", cost: 0, text: "ほかの仲間の道具も使用可能", needs: "四次元ポケット", use: () => {
         state.log = "四次元ポケットが開いた。ドラえもんは仲間の道具も取り出せる。";
       } },
       bigLight: { name: "ビックライト", cost: 8, text: "このターン味方全体のダメージ2倍", needs: "ビックライト", use: () => {
         state.doubleDamageTurns = 1;
         state.log = "ビックライトでみんなの攻撃が巨大化する。このターンの味方ダメージが2倍。";
+      } },
+      richBoast: { name: "金持ち自慢", cost: 0, text: "このターン敵全体の被ダメージ2倍", use: () => {
+        state.enemyVulnerableTurns = 1;
+        state.log = "スネ夫が金持ち自慢をした。敵全体がムキになって、このターン受けるダメージが2倍。";
       } },
       hirariMantle: { name: "ヒラリマント", cost: 0, text: "小ダメージ+受けた半分を反撃", use: () => {
         hitEnemy(12, "スネ夫がヒラリマントでかわしながら当てた。");
@@ -917,35 +1110,56 @@
         state.enemyAttackMultiplier = 0.5;
         state.log = "スモールライトで敵が小さくなった。次の敵攻撃力が半分。";
       } },
-      maamaaStick: { name: "まあまあ棒", cost: 6, text: "敵単体1ターン行動停止", needs: "まあまあ棒", use: () => stopEnemy() },
+      maamaaStick: { name: "まあまあ棒", cost: 20, text: "敵単体1ターン行動停止", needs: "まあまあ棒", use: () => stopEnemy() },
+      showerTime: { name: "シャワータイム", cost: 0, text: "各戦闘1回 味方単体を復活+全回復", once: true, use: () => reviveOneFull("showerTime") },
       doctorBag: { name: "お医者さんカバン", cost: 8, text: "味方全体中回復", needs: "お医者さんカバン", use: () => healParty(24, "お医者さんカバンでみんなを手当てした。") },
-      cheerGlove: { name: "チアガール手ぶくろ", cost: 0, text: "味方単体MP30%回復", use: () => restoreOneMpPercent(0.3) },
-      dressCamera: { name: "着せ替えカメラ", cost: 7, text: "味方全体3ターンダメージ50%カット", needs: "着せ替えカメラ", use: () => {
+      cheerGlove: { name: "チアガール手ぶくろ", cost: 0, text: "味方単体MP10回復", use: () => restoreOneMp(10) },
+      dressCamera: { name: "着せ替えカメラ", cost: 15, text: "味方全体3ターンダメージ50%カット", needs: "着せ替えカメラ", use: () => {
         state.damageCutTurns = 3;
         state.damageCutRate = 0.5;
         state.log = "着せ替えカメラで守りの衣装にチェンジ。3ターン、受けるダメージを50%カット。";
       } },
-      koekatamarin: { name: "コエカタマリン", cost: 5, text: "敵全体中ダメージ", use: () => attackAll(21, "ジャイアンの声が固まって敵全体に飛んだ。") },
+      recital: { name: "リサイタル", cost: 0, text: "各戦闘1回 次の攻撃威力2倍", once: true, use: () => {
+        if (!useOnce("recital")) return;
+        state.nextAttackMultiplier = 2;
+        state.log = "ジャイアンがリサイタルを始めた。次の攻撃の威力が2倍になる。";
+      } },
+      koekatamarin: { name: "コエカタマリン", cost: 0, text: "敵全体15ダメージ", use: () => attackAll(15, "ジャイアンの声が固まって敵全体に飛んだ。") },
       superGlove: { name: "スーパー手袋", cost: 6, text: "敵単体大ダメージ", needs: "スーパー手袋", use: () => hitEnemy(38, "ジャイアンがスーパー手袋で殴り飛ばした。") },
       ultraDeluxePill: { name: "ウルトラスーパーデラックス錠", cost: 9, text: "敵単体極大ダメージ", needs: "ウルトラスーパーデラックス錠", use: () => hitEnemy(58, "ジャイアンがウルトラスーパーデラックス錠で限界突破した。") }
     };
 
     const battlePlans = [
-      { title: "第1戦 いじめられたのび太", scene: "assets/chapter-1-room-story.png", drop: "のび太の空気砲", enemies: [{ name: "暴走空気砲", hp: 68, atk: 14, color: "#ff884e", kind: "air" }] },
-      { title: "第2戦 四次元ポケット", drop: "四次元ポケット", enemies: [{ name: "四次元ポケット", hp: 78, atk: 15, color: "#47b8ec", kind: "mirror" }, { name: "迷子の出口", hp: 44, atk: 10, color: "#7edfd2", kind: "mist" }] },
-      { title: "第3戦 スモールライト", join: "スネ夫が仲間に加わった。", drop: "スモールライト", enemies: [{ name: "スモールライト", hp: 88, atk: 16, color: "#ffd65d", kind: "note" }] },
-      { title: "第4戦 お医者さんカバン", drop: "お医者さんカバン", enemies: [{ name: "お医者さんカバン", hp: 86, atk: 16, color: "#7edfd2", kind: "mist" }, { name: "診察ライト", hp: 52, atk: 11, color: "#9de7ff", kind: "mirror" }] },
-      { title: "第5戦 スーパー手袋", join: "静香が仲間に加わった。", drop: "スーパー手袋", enemies: [{ name: "スーパー手袋", hp: 102, atk: 18, color: "#e46255", kind: "air" }] },
-      { title: "第6戦 ビックライト", drop: "ビックライト", enemies: [{ name: "ビックライト", hp: 92, atk: 17, color: "#ffcd5a", kind: "speaker" }, { name: "巨大化ランプ", hp: 60, atk: 12, color: "#ffb24e", kind: "speaker" }] },
-      { title: "第7戦 まあまあ棒", join: "ジャイアンが仲間に加わった。", drop: "まあまあ棒", enemies: [{ name: "まあまあ棒", hp: 110, atk: 18, color: "#b993ff", kind: "note" }] },
-      { title: "第8戦 着せ替えカメラ", drop: "着せ替えカメラ", enemies: [{ name: "着せ替えカメラ", hp: 88, atk: 15, color: "#f08cb4", kind: "speaker" }, { name: "まぶしいフラッシュ", hp: 74, atk: 13, color: "#ffcd5a", kind: "speaker" }] },
-      { title: "第9戦 名刀電光丸", drop: "名刀電光丸", enemies: [{ name: "名刀電光丸", hp: 124, atk: 20, color: "#65e2ff", kind: "note" }] },
-      { title: "第10戦 ウルトラスーパーデラックス錠", drop: "ウルトラスーパーデラックス錠", enemies: [{ name: "ウルトラスーパーデラックス錠", hp: 96, atk: 17, color: "#aef8ef", kind: "mist" }, { name: "デラックスカプセル", hp: 76, atk: 14, color: "#d7f6ff", kind: "mist" }] },
-      { title: "第11戦 どこでもドア", enemies: [{ name: "どこでもドア", hp: 122, atk: 20, color: "#47b8ec", kind: "mirror" }] },
-      { title: "第12戦 タケコプター", enemies: [{ name: "タケコプター", hp: 88, atk: 17, color: "#ffd65d", kind: "air" }, { name: "回転プロペラ", hp: 78, atk: 15, color: "#ff884e", kind: "air" }] },
-      { title: "第13戦 グルメテーブル掛け", enemies: [{ name: "グルメテーブル掛け", hp: 134, atk: 21, color: "#f08cb4", kind: "mist" }] },
-      { title: "第14戦 コエカタマリン", enemies: [{ name: "コエカタマリン", hp: 102, atk: 18, color: "#e46255", kind: "mic" }, { name: "固まった声", hp: 90, atk: 16, color: "#ff6d7a", kind: "mic" }, { name: "反響のかけら", hp: 68, atk: 14, color: "#ffcd5a", kind: "speaker" }] },
-      { title: "第15戦 できる優等生の計画", boss: true, enemies: [{ name: "出木杉君", hp: 150, atk: 22, color: "#b993ff", kind: "mirror", boss: true }, { name: "完全計画ノート", hp: 112, atk: 17, color: "#65e2ff", kind: "note", boss: true }, { name: "ココロスイッチ暴走体", hp: 124, atk: 19, color: "#ff6d7a", kind: "mic", boss: true }] }
+      { title: "第1戦 いじめられたのび太", scene: "assets/chapter-1-room-story.png", drop: "のび太の空気砲", enemies: [{ name: "暴走空気砲", hp: 72, atk: 14, color: "#ff884e", kind: "air" }] },
+      { title: "第2戦 四次元ポケット", drop: "四次元ポケット", enemies: [{ name: "四次元ポケット", hp: 92, atk: 15, color: "#47b8ec", kind: "mirror" }, { name: "迷子の出口", hp: 58, atk: 10, color: "#7edfd2", kind: "mist" }] },
+      { title: "第3戦 操られしスネ夫", join: "スネ夫が正気に戻って仲間に加わった。", drop: "スモールライト", lines: [
+        { speaker: "スネ夫", text: "ふ、ふん。ぼくのヒラリマントさばき、見せてあげるよ。止められるならね！" },
+        { speaker: "のび太", text: "スネ夫まで操られてる！ そんな意地悪な言い方、いつもよりこわいよ。" },
+        { speaker: "ドラえもん", text: "ヒラリマントで反撃してくる。むやみに攻撃すると痛い目を見るぞ。" },
+        { speaker: "スモールライト", text: "小さくなれ、弱くなれ。さあ、仲間同士で戦え！" }
+      ], enemies: [{ name: "操られしスネ夫", hp: 120, atk: 14, color: "#64b6e8", kind: "mirror", heroId: "suneta", attackText: "ヒラリマントで受け流して反撃した" }, { name: "スモールライト", hp: 88, atk: 13, color: "#ffd65d", kind: "note", attackText: "小さな光で力を削った" }] },
+      { title: "第4戦 お医者さんカバン", drop: "お医者さんカバン", enemies: [{ name: "お医者さんカバン", hp: 145, atk: 16, color: "#7edfd2", kind: "mist" }, { name: "診察ライト", hp: 98, atk: 11, color: "#9de7ff", kind: "mirror" }] },
+      { title: "第5戦 操られし静香", join: "静香が正気に戻って仲間に加わった。", drop: "スーパー手袋", lines: [
+        { speaker: "静香", text: "ごめんなさい。でも、体が勝手に……チアガール手ぶくろが、みんなを変に応援しちゃうの。" },
+        { speaker: "のび太", text: "静香ちゃん！ ぼくたちが止めるから、少しだけがまんして！" },
+        { speaker: "ドラえもん", text: "回復役が敵に回ると長引く。スーパー手袋も一緒に暴れているぞ。" },
+        { speaker: "スーパー手袋", text: "力こそ応援！ まとめて押し返してやる！" }
+      ], enemies: [{ name: "操られし静香", hp: 170, atk: 15, color: "#f08cb4", kind: "mist", heroId: "shizumi", attackText: "チアガール手ぶくろのまぶしい応援をぶつけた" }, { name: "スーパー手袋", hp: 130, atk: 19, color: "#e46255", kind: "air", attackText: "スーパー手袋で殴りかかった" }] },
+      { title: "第6戦 ビックライト", drop: "ビックライト", enemies: [{ name: "ビックライト", hp: 190, atk: 19, color: "#ffcd5a", kind: "speaker" }, { name: "巨大化ランプ", hp: 135, atk: 15, color: "#ffb24e", kind: "speaker" }] },
+      { title: "第7戦 操られしジャイアン", join: "ジャイアンが正気に戻って仲間に加わった。", drop: "まあまあ棒", lines: [
+        { speaker: "ジャイアン", text: "うおおお！ 俺様の歌を聞けえ！ ……って、なんで止まらねえんだ！？" },
+        { speaker: "のび太", text: "ひいっ、いつもの歌よりもっと危ない！" },
+        { speaker: "スネ夫", text: "ジャ、ジャイアン！ ぼくは味方だってば！ その声、こっちに向けないでよ！" },
+        { speaker: "ドラえもん", text: "コエカタマリンで全体攻撃してくる。まあまあ棒を回収して動きを止めよう。" }
+      ], enemies: [{ name: "操られしジャイアン", hp: 230, atk: 21, color: "#e0664d", kind: "mic", heroId: "gouta", attackText: "コエカタマリンで固まった歌声を飛ばした" }, { name: "まあまあ棒", hp: 165, atk: 17, color: "#b993ff", kind: "note", attackText: "まあまあ棒で動きを鈍らせた" }] },
+      { title: "第8戦 着せ替えカメラ", drop: "着せ替えカメラ", enemies: [{ name: "着せ替えカメラ", hp: 250, atk: 20, color: "#f08cb4", kind: "speaker" }, { name: "まぶしいフラッシュ", hp: 185, atk: 17, color: "#ffcd5a", kind: "speaker" }] },
+      { title: "第9戦 名刀電光丸", drop: "名刀電光丸", enemies: [{ name: "名刀電光丸", hp: 290, atk: 22, color: "#65e2ff", kind: "note" }] },
+      { title: "第10戦 ウルトラスーパーデラックス錠", drop: "ウルトラスーパーデラックス錠", enemies: [{ name: "ウルトラスーパーデラックス錠", hp: 315, atk: 23, color: "#aef8ef", kind: "mist" }, { name: "デラックスカプセル", hp: 230, atk: 19, color: "#d7f6ff", kind: "mist" }] },
+      { title: "第11戦 どこでもドア", enemies: [{ name: "どこでもドア", hp: 350, atk: 24, color: "#47b8ec", kind: "mirror" }] },
+      { title: "第12戦 タケコプター", enemies: [{ name: "タケコプター", hp: 330, atk: 25, color: "#ffd65d", kind: "air" }, { name: "回転プロペラ", hp: 260, atk: 21, color: "#ff884e", kind: "air" }] },
+      { title: "第13戦 グルメテーブル掛け", enemies: [{ name: "グルメテーブル掛け", hp: 410, atk: 27, color: "#f08cb4", kind: "mist" }] },
+      { title: "第14戦 コエカタマリン", enemies: [{ name: "コエカタマリン", hp: 430, atk: 28, color: "#e46255", kind: "mic" }, { name: "固まった声", hp: 340, atk: 25, color: "#ff6d7a", kind: "mic" }, { name: "反響のかけら", hp: 260, atk: 22, color: "#ffcd5a", kind: "speaker" }] },
+      { title: "第15戦 できる優等生の計画", boss: true, enemies: [{ name: "出木杉君", hp: 500, atk: 30, color: "#b993ff", kind: "mirror", boss: true }, { name: "完全計画ノート", hp: 380, atk: 26, color: "#65e2ff", kind: "note", boss: true }, { name: "ココロスイッチ暴走体", hp: 420, atk: 28, color: "#ff6d7a", kind: "mic", boss: true }] }
     ];
 
     const chapters = battlePlans.map((plan, index) => {
@@ -954,7 +1168,7 @@
         title: plan.title,
         scene: plan.scene,
         story: `${firstEnemy}が感情を爆発させている。`,
-        lines: index === 0 ? [
+        lines: plan.lines || (index === 0 ? [
           { speaker: "のび太", text: "ジャイアンにいじめられたよー！ もう外に出たくないよ。" },
           { speaker: "ドラえもん", text: "よし、道具にやさしい心を教えるココロスイッチを使ってみよう。" },
           { speaker: "のび太", text: "それ、ほんとに安全なの？ なんか赤く光ってるけど。" },
@@ -965,7 +1179,7 @@
           { speaker: "のび太", text: "HPとMPは戦闘をまたいでも戻らないんだよね。慎重にいこう。" },
           { speaker: firstEnemy, text: `ぼくの気持ちを分かってくれないなら、力で分からせる！` },
           { speaker: "ドラえもん", text: plan.drop ? `${plan.drop}を回収できれば、新しい技が使えるはずだ。` : "これが最後の戦いだ。" }
-        ],
+        ]),
         log: plan.boss ? "15戦目。出木杉君の計画を止めよう。" : `${index + 1}/15戦目。${plan.drop || firstEnemy}を回収して次へ進もう。`,
         join: plan.join,
         boss: plan.boss,
@@ -984,13 +1198,18 @@
       guard: 0,
       mpItems: 3,
       invincibleTurns: 0,
+      hiddenHeroId: null,
       evasionBonus: 0,
       doubleDamageTurns: 0,
+      enemyVulnerableTurns: 0,
+      nextAttackMultiplier: 1,
       damageCutTurns: 0,
       damageCutRate: 0,
       enemyAttackMultiplier: 1,
       counterHeroId: null,
       counterRate: 0,
+      onceUsed: {},
+      actionCancelled: false,
       actedThisRound: [],
       defeatCount: 0,
       lastReward: "",
@@ -1029,6 +1248,7 @@
       state.guard = 0;
       resetTurnEffects();
       state.actedThisRound = [];
+      resetBattleLimitedSkills();
       const rewardLine = state.lastReward;
       state.log = rewardLine ? `${rewardLine} ${chapter.log}` : chapter.log;
       state.lastReward = "";
@@ -1036,7 +1256,6 @@
       state.storyLines = buildStoryLines(chapter, rewardLine);
       el.chapter.textContent = chapter.title;
       document.getElementById("arena").style.setProperty("--scene-image", `url("${chapter.scene || "assets/kid-room-battle.png"}")`);
-      if (chapter.join) state.log = `${chapter.join} ${state.log}`;
       el.log.textContent = state.log;
       renderStoryLine();
       render();
@@ -1083,7 +1302,6 @@
 
     function buildStoryLines(chapter, rewardLine) {
       const lines = [];
-      if (chapter.join) lines.push({ speaker: "加入", text: chapter.join });
       if (rewardLine) lines.push({ speaker: "回収", text: rewardLine });
       return lines.concat(chapter.lines || [{ speaker: "ストーリー", text: chapter.story }]);
     }
@@ -1134,6 +1352,11 @@
       }
       const skill = skillBook[id];
       if (!skill || !skillAvailable(id)) return;
+      if (skill.once && state.onceUsed[id]) {
+        state.log = "この特技はこの戦闘ではもう使えない。";
+        render();
+        return;
+      }
       if (hero.mp < skill.cost) {
         state.log = `${hero.name}はMPが足りない。`;
         render();
@@ -1141,7 +1364,13 @@
       }
       hero.mp -= skill.cost;
       flashUnit(hero.id, "attack");
+      state.actionCancelled = false;
       skill.use();
+      if (state.actionCancelled) {
+        state.actionCancelled = false;
+        render();
+        return;
+      }
       markActed(hero);
       if (state.enemies.every((enemy) => enemy.hp <= 0)) {
         setTimeout(victory, 720);
@@ -1254,6 +1483,47 @@
       state.log = `${text} ${target.name}のHPが${amount}回復。`;
     }
 
+    function hideOneAlly() {
+      const target = joinedHeroes()
+        .filter((hero) => hero.hp > 0)
+        .sort((a, b) => (a.hp / a.maxHp) - (b.hp / b.maxHp))[0];
+      if (!target) {
+        state.log = "姿を隠せる味方がいない。";
+        state.actionCancelled = true;
+        return;
+      }
+      state.hiddenHeroId = target.id;
+      popupUnit(target.id, "隠れた", "heal");
+      state.log = `ドラえもんがどこでもドアを開いた。${target.name}は1ターン姿を隠し、敵から狙われない。`;
+    }
+
+    function fullRecoverSelf(skillId, text) {
+      if (!useOnce(skillId)) return;
+      const hero = aliveHero();
+      hero.hp = hero.maxHp;
+      hero.mp = hero.maxMp;
+      popupUnit(hero.id, "全回復", "heal");
+      state.log = text;
+    }
+
+    function reviveOneFull(skillId) {
+      if (!useOnce(skillId)) return;
+      const target = joinedHeroes()
+        .filter((hero) => hero.hp <= 0)
+        .sort((a, b) => b.maxHp - a.maxHp)[0]
+        || joinedHeroes().filter((hero) => hero.hp > 0 && hero.hp < hero.maxHp).sort((a, b) => (a.hp / a.maxHp) - (b.hp / b.maxHp))[0];
+      if (!target) {
+        state.log = "今はシャワータイムが必要な味方がいない。";
+        state.onceUsed[skillId] = false;
+        state.actionCancelled = true;
+        return;
+      }
+      target.hp = target.maxHp;
+      target.mp = target.maxMp;
+      popupUnit(target.id, "復活", "heal");
+      state.log = `静香のシャワータイム。${target.name}が復活してHPとMPが全回復。`;
+    }
+
     function restoreMp() {
       if (state.mpItems <= 0) {
         state.log = "デンチキャンディはもう残っていない。";
@@ -1282,6 +1552,19 @@
         return;
       }
       const amount = Math.max(1, Math.ceil(target.maxMp * percent));
+      target.mp = Math.min(target.maxMp, target.mp + amount);
+      popupUnit(target.id, `MP+${amount}`, "heal");
+      state.log = `チアガール手ぶくろで${target.name}を応援した。MPが${amount}回復。`;
+    }
+
+    function restoreOneMp(amount) {
+      const target = joinedHeroes()
+        .filter((hero) => hero.hp > 0 && hero.mp < hero.maxMp)
+        .sort((a, b) => (a.mp / a.maxMp) - (b.mp / b.maxMp))[0];
+      if (!target) {
+        state.log = "今はMP回復が必要な味方がいない。";
+        return;
+      }
       target.mp = Math.min(target.maxMp, target.mp + amount);
       popupUnit(target.id, `MP+${amount}`, "heal");
       state.log = `チアガール手ぶくろで${target.name}を応援した。MPが${amount}回復。`;
@@ -1319,18 +1602,41 @@
     }
 
     function consumeDamageMultiplier() {
-      return state.doubleDamageTurns > 0 ? 2 : 1;
+      let multiplier = state.doubleDamageTurns > 0 ? 2 : 1;
+      if (state.enemyVulnerableTurns > 0) multiplier *= 2;
+      if (state.nextAttackMultiplier > 1) {
+        multiplier *= state.nextAttackMultiplier;
+        state.nextAttackMultiplier = 1;
+      }
+      return multiplier;
     }
 
     function resetTurnEffects() {
       state.invincibleTurns = 0;
+      state.hiddenHeroId = null;
       state.evasionBonus = 0;
       state.doubleDamageTurns = 0;
+      state.enemyVulnerableTurns = 0;
+      state.nextAttackMultiplier = 1;
       state.damageCutTurns = 0;
       state.damageCutRate = 0;
       state.enemyAttackMultiplier = 1;
       state.counterHeroId = null;
       state.counterRate = 0;
+    }
+
+    function resetBattleLimitedSkills() {
+      state.onceUsed = {};
+    }
+
+    function useOnce(skillId) {
+      if (state.onceUsed[skillId]) {
+        state.log = "この特技はこの戦闘ではもう使えない。";
+        state.actionCancelled = true;
+        return false;
+      }
+      state.onceUsed[skillId] = true;
+      return true;
     }
 
     function enemyTurn() {
@@ -1353,7 +1659,7 @@
           popupUnit(other.name, selfDamage, "bad");
           continue;
         }
-        const targets = joinedHeroes().filter((hero) => hero.hp > 0);
+        const targets = joinedHeroes().filter((hero) => hero.hp > 0 && hero.id !== state.hiddenHeroId);
         if (!targets.length) break;
         const target = targets[random(0, targets.length - 1)];
         if (state.invincibleTurns > 0) {
@@ -1369,7 +1675,7 @@
         const cut = state.damageCutTurns > 0 ? (1 - state.damageCutRate) : 1;
         const damage = Math.max(3, Math.floor((enemy.atk - state.enemyDebuff - state.guard + random(-2, 3)) * state.enemyAttackMultiplier * cut));
         target.hp -= damage;
-        state.log = `${enemy.name}の逆襲。${target.name}に${damage}ダメージ。`;
+        state.log = `${enemy.name}は${enemy.attackText || "逆襲した"}。${target.name}に${damage}ダメージ。`;
         if (state.damageCutTurns > 0) state.log += " 着せ替えカメラで軽減。";
         flashUnit(target.id, "hit");
         popupUnit(target.id, damage, "bad");
@@ -1382,8 +1688,10 @@
         }
       }
       state.invincibleTurns = 0;
+      state.hiddenHeroId = null;
       state.evasionBonus = 0;
       state.doubleDamageTurns = 0;
+      state.enemyVulnerableTurns = 0;
       if (state.damageCutTurns > 0) {
         state.damageCutTurns -= 1;
         if (state.damageCutTurns <= 0) state.damageCutRate = 0;
@@ -1432,6 +1740,7 @@
       state.guard = 0;
       resetTurnEffects();
       state.actedThisRound = [];
+      resetBattleLimitedSkills();
       state.rewinding = false;
       state.phase = "battle";
       state.active = heroes.findIndex((hero) => isJoined(hero) && hero.hp > 0);
@@ -1464,8 +1773,11 @@
       } else {
         state.chapter += 1;
         const dropText = chapter.enemies.map((enemy) => enemy.drop).filter(Boolean).join("、");
-        state.lastReward = dropText
-          ? `${dropText}を回収した。次の戦闘から新しい技が使える。`
+        const rewardParts = [];
+        if (dropText) rewardParts.push(`${dropText}を回収した。次の戦闘から新しい技が使える。`);
+        if (chapter.join) rewardParts.push(chapter.join);
+        state.lastReward = rewardParts.length
+          ? rewardParts.join(" ")
           : `${chapter.title}を突破した。息を整えて次へ進もう。`;
         startChapter();
         el.log.textContent = state.log;
@@ -1503,6 +1815,7 @@
     }
 
     function render() {
+      document.body.classList.toggle("compact-battle", ["battle", "enemy", "defeat"].includes(state.phase));
       renderParty();
       renderEnemies();
       renderRoster();
@@ -1524,12 +1837,15 @@
       el.party.innerHTML = heroes.filter((hero) => isJoined(hero)).map((hero, index) => {
         const heroIndex = heroes.indexOf(hero);
         const style = hero.shirt ? `style="--shirt:${hero.shirt}"` : "";
-        const cls = ["unit", hero.cat ? "cat" : "person", heroIndex === state.active && state.phase === "battle" ? "active" : "", hero.hp <= 0 ? "down" : ""].join(" ");
-        const avatar = hero.cat
-          ? `<div class="avatar"><div class="ear left"></div><div class="ear right"></div><div class="body"></div><div class="face"></div><div class="eye"></div><div class="pocket"></div></div>`
-          : `<div class="avatar"><div class="hair"></div><div class="head"></div><div class="body"></div><div class="eye"></div></div>`;
-        return `<div class="${cls}" data-unit="${hero.id}" ${style}>${avatar}<div class="nameplate">${hero.name}</div></div>`;
+        const cls = ["unit", hero.cat ? "cat" : "person", heroIndex === state.active && state.phase === "battle" ? "active" : "", hero.id === state.hiddenHeroId ? "hidden" : "", hero.hp <= 0 ? "down" : ""].join(" ");
+        return `<div class="${cls}" data-unit="${hero.id}" ${style}>${heroAvatar(hero)}<div class="nameplate">${hero.name}</div></div>`;
       }).join("");
+    }
+
+    function heroAvatar(hero) {
+      return hero.cat
+        ? `<div class="avatar"><div class="ear left"></div><div class="ear right"></div><div class="body"></div><div class="face"></div><div class="eye"></div><div class="pocket"></div></div>`
+        : `<div class="avatar"><div class="hair"></div><div class="head"></div><div class="body"></div><div class="eye"></div></div>`;
     }
 
     function renderEnemies() {
@@ -1538,9 +1854,17 @@
         return;
       }
       el.enemy.innerHTML = state.enemies.map((enemy) => {
-        const cls = ["unit", "gadget", enemy.boss ? "boss" : "", enemy.hp <= 0 ? "down" : ""].join(" ");
         const hp = Math.max(0, enemy.hp);
-        return `<div class="${cls}" data-unit="${enemy.name}" style="--gadget:${enemy.color}"><div class="avatar gadget-art ${enemy.kind || "air"}">${gadgetMarkup(enemy.kind)}</div><div class="nameplate">${enemy.name} ${hp}/${enemy.maxHp}</div></div>`;
+        const hpWidth = Math.max(0, Math.min(100, hp / enemy.maxHp * 100));
+        const hpBar = `<div class="enemy-hp"><div class="enemy-hp-fill" style="width:${hpWidth}%"></div><span class="enemy-hp-text">${hp}/${enemy.maxHp}</span></div>`;
+        if (enemy.heroId) {
+          const hero = heroes.find((member) => member.id === enemy.heroId);
+          const cls = ["unit", hero?.cat ? "cat" : "person", enemy.hp <= 0 ? "down" : ""].join(" ");
+          const style = hero?.shirt ? `style="--shirt:${hero.shirt}"` : "";
+          return `<div class="${cls}" data-unit="${enemy.name}" ${style}>${hpBar}${heroAvatar(hero || {})}<div class="nameplate">${enemy.name}</div></div>`;
+        }
+        const cls = ["unit", "gadget", enemy.boss ? "boss" : "", enemy.hp <= 0 ? "down" : ""].join(" ");
+        return `<div class="${cls}" data-unit="${enemy.name}" style="--gadget:${enemy.color}">${hpBar}<div class="avatar gadget-art ${enemy.kind || "air"}">${gadgetMarkup(enemy.kind)}</div><div class="nameplate">${enemy.name}</div></div>`;
       }).join("");
     }
 
@@ -1588,8 +1912,9 @@
         const skill = skillBook[id];
         const available = skillAvailable(id);
         const acted = state.actedThisRound.includes(hero.id);
-        const disabled = state.phase !== "battle" || hero.hp <= 0 || hero.mp < skill.cost || !available || acted;
-        const lock = available ? "" : "未回収";
+        const usedOnce = skill.once && state.onceUsed[id];
+        const disabled = state.phase !== "battle" || hero.hp <= 0 || hero.mp < skill.cost || !available || acted || usedOnce;
+        const lock = available ? (usedOnce ? "使用済み" : "") : "未回収";
         const borrowed = hero.id === "cat" && !hero.skills.includes(id) ? " / 借り道具" : "";
         const detail = `${skill.text}${borrowed}`;
         return `<button class="skill" data-skill="${id}" ${disabled ? "disabled" : ""}>
