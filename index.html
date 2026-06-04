@@ -193,6 +193,28 @@
     .unit.chosen-target { filter: drop-shadow(0 0 16px rgba(156, 255, 159, 0.9)); }
     .unit.down { opacity: 0.48; filter: grayscale(0.7); }
     .unit.hidden { opacity: 0.28; filter: saturate(0.3) blur(1px); }
+    .unit.stopped::before {
+      content: "×";
+      position: absolute;
+      z-index: 4;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border: 3px solid rgba(255, 247, 219, 0.95);
+      border-radius: 50%;
+      background: rgba(239, 107, 98, 0.9);
+      color: #fff7db;
+      font-size: 2.1rem;
+      font-weight: 1000;
+      line-height: 1;
+      text-shadow: 0 2px 0 rgba(0, 0, 0, 0.34);
+      pointer-events: none;
+    }
+
     .unit.shrunk .avatar {
       transform: scale(0.68);
       transform-origin: center bottom;
@@ -1424,8 +1446,9 @@
     const skillBook = {
       nap: { name: "昼寝", cost: 0, text: "各戦闘1回 自分を全回復", once: true, use: () => fullRecoverSelf("nap", "のび太は一瞬で昼寝した。起きたらHPとMPが全回復。") },
       ataruGun: { name: "アタールガン", cost: 0, text: "敵単体小ダメージ", target: "enemy", use: (target) => hitEnemy(freeDamage(15), "のび太がアタールガンで狙い撃ちした。", target) },
-      nobitaAirCannon: { name: "空気砲", cost: 5, text: "敵単体50ダメージ", needs: "のび太の空気砲", target: "enemy", use: (target) => {
-        hitEnemy(50, "のび太の空気砲が一点に空気弾を撃ち込んだ。", target);
+      nobitaAirCannon: { name: "空気砲", cost: 5, text: "敵単体30ダメージ", needs: "のび太の空気砲", target: "enemy", use: (target) => {
+        const damage = hasReward("空気砲強化") ? 50 : 30;
+        hitEnemy(damage, "のび太の空気砲が一点に空気弾を撃ち込んだ。", target);
       } },
       denkomaru: { name: "名刀電光丸", cost: 30, text: "敵単体50ダメージ+味方全体1ターン無敵", needs: "名刀電光丸", target: "enemy", use: (target) => {
         showTurnBanner("僕がみんなを守る！");
@@ -1499,7 +1522,7 @@
         const damage = hasReward("コエカタマリン強化") ? 30 : 20;
         attackAll(freeDamage(damage), "ジャイアンの声が固まって敵全体に飛んだ。");
       } },
-      superGlove: { name: "スーパー手袋", cost: 6, text: "敵単体大ダメージ", needs: "スーパー手袋", target: "enemy", use: (target) => hitEnemy(38, "ジャイアンがスーパー手袋で殴り飛ばした。", target) },
+      superGlove: { name: "スーパー手袋", cost: 6, text: "敵単体20ダメージ×1〜5回", needs: "スーパー手袋", target: "enemy", use: (target) => superGloveAttack(target) },
       ultraDeluxePill: { name: "ウルトラスーパーデラックス錠", cost: 20, text: "5ターン無敵", needs: "ウルトラスーパーデラックス錠", use: () => {
         state.invincibleTurns = Math.max(state.invincibleTurns, 5);
         state.log = "ジャイアンがウルトラスーパーデラックス錠で気合いを入れた。味方全体が5ターン無敵。";
@@ -1511,60 +1534,59 @@
 
     const battlePlans = [
       { title: "第1戦 いじめられたのび太", scene: "assets/chapter-1-room-story.png", drop: "のび太の空気砲", enemies: [{ name: "暴走空気砲", hp: 72, atk: 14, fixedDamage: 14, color: "#ff884e", kind: "air", attackName: "ドカン！" }] },
-      { title: "第2戦 四次元ポケット", drop: "四次元ポケット", enemies: [{ name: "四次元ポケット", hp: 92, atk: 20, color: "#47b8ec", kind: "mirror", attackName: "何がでるかな", attackPattern: "pocket" }, { name: "迷子ミニドラ", hp: 58, atk: 10, color: "#7edfd2", kind: "mist" }] },
+      { title: "第2戦 四次元ポケット", drop: "四次元ポケット", enemies: [{ name: "四次元ポケット", hp: 62, atk: 20, color: "#47b8ec", kind: "mirror", attackName: "何がでるかな", attackPattern: "pocket" }, { name: "迷子ミニドラ", hp: 58, atk: 10, color: "#7edfd2", kind: "mist" }] },
       { title: "第3戦 操られしスネ夫とヒラリマント", join: "スネ夫が正気に戻って仲間に加わった。", lines: [
         { speaker: "スネ夫", text: "ふ、ふん。ぼくのヒラリマントさばき、見せてあげるよ。止められるならね！" },
         { speaker: "のび太", text: "スネ夫まで操られてる！ そんな意地悪な言い方、いつもよりこわいよ。" },
         { speaker: "ドラえもん", text: "ヒラリマントで反撃してくる。むやみに攻撃すると痛い目を見るぞ。" },
         { speaker: "ヒラリマント", text: "ひらり、ひらり。攻撃は受け流して返すよ。" }
-      ], enemies: [{ name: "操られしスネ夫", hp: 120, atk: 14, color: "#64b6e8", kind: "mirror", heroId: "suneta", attackName: "ヒラリ返し", attackText: "ヒラリマントで受け流して反撃した" }, { name: "ヒラリマント", hp: 88, atk: 13, color: "#9de7ff", kind: "mirror", attackName: "ひらり反撃", attackText: "ひらりとかわして反撃した", counterRate: 0.5 }] },
-      { title: "第4戦 スモールライト", drop: "スモールライト", enemies: [{ name: "スモールライト", hp: 145, atk: 16, color: "#ffd65d", kind: "note", attackName: "縮小光線", attackEffect: "weak" }, { name: "憤慨ミニドラ", hp: 104, atk: 15, fixedDamage: 15, color: "#ffb24e", kind: "speaker", attackName: "ぷんぷん突撃", attackScope: "allFixed" }] },
+      ], enemies: [{ name: "操られしスネ夫", hp: 100, atk: 14, color: "#64b6e8", kind: "mirror", heroId: "suneta", attackName: "ヒラリ返し", attackText: "ヒラリマントで受け流して反撃した" }, { name: "ヒラリマント", hp: 88, atk: 13, color: "#9de7ff", kind: "mirror", attackName: "ひらり反撃", attackText: "ひらりとかわして反撃した", counterRate: 0.5 }] },
+      { title: "第4戦 スモールライト", drop: "スモールライト", enemies: [{ name: "スモールライト", hp: 120, atk: 16, color: "#ffd65d", kind: "note", attackName: "縮小光線", attackEffect: "weak" }, { name: "憤慨ミニドラ", hp: 104, atk: 15, fixedDamage: 15, color: "#ffb24e", kind: "speaker", attackName: "ぷんぷん突撃", attackScope: "allFixed" }] },
       { title: "第5戦 操られし静香とチアガール手ぶくろ", join: "静香が正気に戻って仲間に加わった。", lines: [
         { speaker: "静香", text: "ごめんなさい。でも、体が勝手に……チアガール手ぶくろが、みんなを変に応援しちゃうの。" },
         { speaker: "のび太", text: "静香ちゃん！ ぼくたちが止めるから、少しだけがまんして！" },
         { speaker: "ドラえもん", text: "チアガール手ぶくろでMPを支えながら攻めてくる。お医者さんカバンを回収できれば全体回復が使えるぞ。" },
         { speaker: "チアガール手ぶくろ", text: "応援、応援、もっと応援！ 静香ちゃんを止めさせないよ。" }
-      ], enemies: [{ name: "操られし静香", hp: 170, atk: 15, color: "#f08cb4", kind: "mist", heroId: "shizumi", attackName: "応援ショック", attackText: "チアガール手ぶくろのまぶしい応援をぶつけた" }, { name: "チアガール手ぶくろ", hp: 130, atk: 18, color: "#f7a8c8", kind: "speaker", attackName: "チアフラッシュ", attackText: "応援の光でMPを乱した" }] },
-      { title: "第6戦 お医者さんカバン", drop: "お医者さんカバン", enemies: [{ name: "お医者さんカバン", hp: 190, atk: 0, color: "#7edfd2", kind: "mist", attackName: "診察ライト", healAttackName: "診察ライト", healTargetIncludes: "ミニドラ", healAmount: 30 }, { name: "閃光ミニドラ", hp: 142, atk: 15, fixedDamage: 15, color: "#9de7ff", kind: "mirror", attackName: "ぴかぴか突撃", attackScope: "allFixed" }] },
+      ], enemies: [{ name: "操られし静香", hp: 100, atk: 15, color: "#f08cb4", kind: "mist", heroId: "shizumi", attackName: "応援ショック", attackText: "チアガール手ぶくろのまぶしい応援をぶつけた" }, { name: "チアガール手ぶくろ", hp: 130, atk: 18, color: "#f7a8c8", kind: "speaker", attackName: "チアフラッシュ", attackText: "応援の光でMPを乱した" }] },
+      { title: "第6戦 お医者さんカバン", drop: "お医者さんカバン", enemies: [{ name: "お医者さんカバン", hp: 150, atk: 0, color: "#7edfd2", kind: "mist", attackName: "診察ライト", healAttackName: "診察ライト", healTargetIncludes: "ミニドラ", healAmount: 30 }, { name: "閃光ミニドラ", hp: 142, atk: 15, fixedDamage: 15, color: "#9de7ff", kind: "mirror", attackName: "ぴかぴか突撃", attackScope: "allFixed" }] },
       { title: "第7戦 操られしジャイアンとコエカタマリン", join: "ジャイアンが正気に戻って仲間に加わった。", lines: [
         { speaker: "ジャイアン", text: "うおおお！ 俺様の歌を聞けえ！ ……って、なんで止まらねえんだ！？" },
         { speaker: "のび太", text: "ひいっ、いつもの歌よりもっと危ない！" },
         { speaker: "スネ夫", text: "ジャ、ジャイアン！ ぼくは味方だってば！ その声、こっちに向けないでよ！" },
         { speaker: "ドラえもん", text: "コエカタマリンで範囲攻撃してくる。歌声を固められる前に止めよう。" },
         { speaker: "コエカタマリン", text: "声を固めて、まとめてぶつけるぞ！" }
-      ], enemies: [{ name: "操られしジャイアン", hp: 230, atk: 20, fixedDamage: 20, color: "#e0664d", kind: "mic", heroId: "gouta", attackName: "ぶっ飛ばすデンジャラス", attackText: "コエカタマリンで小さな範囲攻撃を放った", attackScope: "allFixed" }, { name: "コエカタマリン", hp: 165, atk: 20, fixedDamage: 20, color: "#e46255", kind: "mic", attackName: "音塊ショット", attackText: "固まった声をぶつけた" }] },
-      { title: "第8戦 スーパー手袋", drop: "スーパー手袋", enemies: [{ name: "スーパー手袋", hp: 250, atk: 30, fixedDamage: 30, color: "#e46255", kind: "air", attackName: "スーパー殴打" }, { name: "奔走ミニドラ", hp: 100, atk: 10, fixedDamage: 10, color: "#d4c2ff", kind: "mist", attackName: "走り回り", attackScope: "allFixed" }, { name: "奔走ミニドラ", hp: 100, atk: 10, fixedDamage: 10, color: "#d4c2ff", kind: "mist", attackName: "走り回り", attackScope: "allFixed" }] },
-      { title: "第9戦 まあまあ棒", drop: "まあまあ棒", enemies: [{ name: "まあまあ棒", hp: 290, atk: 50, fixedDamage: 50, color: "#b993ff", kind: "note", attackName: "なだめ突き", attackEffect: "stun" }, { name: "閃光ミニドラ", hp: 142, atk: 13, fixedDamage: 13, color: "#9de7ff", kind: "note", attackName: "ぴかぴか突撃", attackScope: "allFixed" }] },
-      { title: "第10戦 着せ替えカメラ", drop: "着せ替えカメラ", enemies: [{ name: "着せ替えカメラ", hp: 315, atk: 18, fixedDamage: 18, color: "#f08cb4", kind: "speaker", attackName: "まぶしいフラッシュ", attackScope: "allFixed" }, { name: "肥大ミニドラ", hp: 230, atk: 19, color: "#d7f6ff", kind: "mist", attackName: "ふくらみ体当たり" }] },
+      ], enemies: [{ name: "操られしジャイアン", hp: 100, atk: 20, fixedDamage: 20, color: "#e0664d", kind: "mic", heroId: "gouta", attackName: "ぶっ飛ばすデンジャラス", attackText: "コエカタマリンで小さな範囲攻撃を放った", attackScope: "allFixed" }, { name: "コエカタマリン", hp: 165, atk: 20, fixedDamage: 20, color: "#e46255", kind: "mic", attackName: "音塊ショット", attackText: "固まった声をぶつけた" }] },
+      { title: "第8戦 スーパー手袋", drop: "スーパー手袋", enemies: [{ name: "スーパー手袋", hp: 220, atk: 20, fixedDamage: 20, color: "#e46255", kind: "air", attackName: "スーパー殴打", attackPattern: "superGlove" }, { name: "奔走ミニドラ", hp: 100, atk: 10, fixedDamage: 10, color: "#d4c2ff", kind: "mist", attackName: "走り回り", attackScope: "allFixed" }, { name: "奔走ミニドラ", hp: 100, atk: 10, fixedDamage: 10, color: "#d4c2ff", kind: "mist", attackName: "走り回り", attackScope: "allFixed" }] },
+      { title: "第9戦 まあまあ棒", drop: "まあまあ棒", enemies: [{ name: "まあまあ棒", hp: 220, atk: 50, fixedDamage: 50, color: "#b993ff", kind: "note", attackName: "なだめ突き", attackEffect: "stun" }, { name: "閃光ミニドラ", hp: 142, atk: 13, fixedDamage: 13, color: "#9de7ff", kind: "note", attackName: "ぴかぴか突撃", attackScope: "allFixed" }] },
+      { title: "第10戦 着せ替えカメラ", drop: "着せ替えカメラ", enemies: [{ name: "着せ替えカメラ", hp: 220, atk: 18, color: "#f08cb4", kind: "speaker", attackName: "まぶしいフラッシュ", attackPattern: "dressCamera" }, { name: "肥大ミニドラ", hp: 230, atk: 30, fixedDamage: 30, color: "#d7f6ff", kind: "mist", attackName: "ふくらみ体当たり", attackScope: "allFixed" }] },
       { title: "第11戦 ウルトラスーパーデラックス錠", drop: "ウルトラスーパーデラックス錠", lines: [
-        { speaker: "ドラえもん", text: "ウルトラスーパーデラックス錠はHP無限で5ターン無敵だ。でも5ターン後に消滅する。" },
+        { speaker: "ドラえもん", text: "ウルトラスーパーデラックス錠はHP無限で3ターン無敵だ。でも3ターン後に消滅する。" },
         { speaker: "スネ夫", text: "つまり耐えれば勝ちってこと？ でも全体攻撃30はきついよ！" },
-        { speaker: "ウルトラスーパーデラックス錠", text: "ウルトラスーパーデラックス！ 5ターンだけ、ぼくは止まらない！" }
-      ], enemies: [{ name: "ウルトラスーパーデラックス錠", hp: 9999, atk: 30, fixedDamage: 30, color: "#ffcd5a", kind: "speaker", attackName: "ウルトラスーパーデラックス！", attackScope: "allFixed", immortal: true, vanishAfterTurns: 5 }] },
-      { title: "第12戦 どこでもドア強化", drop: "どこでもドア強化", enemies: [{ name: "どこでもドア", hp: 350, atk: 20, fixedDamage: 20, color: "#47b8ec", kind: "mirror", attackName: "逆襲", attackEffect: "stun", actionsPerTurn: 3 }] },
-      { title: "第13戦 空気砲強化", drop: "空気砲強化", enemies: [{ name: "空気砲", hp: 370, atk: 25, color: "#ff884e", kind: "air", attackName: "逆襲", attackPattern: "airCannon" }, { name: "飛行ミニドラ", hp: 285, atk: 21, fixedDamage: 21, color: "#ffd65d", kind: "air", attackName: "翻弄", evasionRate: 0.5 }] },
-      { title: "第14戦 グルメテーブル掛け強化", drop: "グルメテーブル掛け強化", enemies: [{ name: "グルメテーブル掛け", hp: 410, atk: 27, color: "#f08cb4", kind: "mist" }, { name: "満腹ミニドラ", hp: 315, atk: 23, color: "#ffcd5a", kind: "speaker" }] },
-      { title: "第15戦 名刀電光丸強化", drop: ["名刀電光丸", "名刀電光丸強化"], enemies: [{ name: "名刀電光丸", hp: 430, atk: 28, color: "#65e2ff", kind: "note", attackName: "電光斬り" }, { name: "憤怒ミニドラ", hp: 340, atk: 25, color: "#ff6d7a", kind: "mic", attackName: "怒りの叫び" }, { name: "終末のミニドラ", hp: 360, atk: 26, color: "#ffcd5a", kind: "speaker", attackName: "終末警報" }] },
-      { title: "第16戦 ヒラリマント強化", drop: "ヒラリマント強化", enemies: [{ name: "強化ヒラリマント", hp: 385, atk: 27, color: "#7edfd2", kind: "mirror", attackName: "強化ひらり反撃", counterRate: 1 }, { name: "混線ミニドラ", hp: 330, atk: 24, color: "#7edfd2", kind: "mirror", attackName: "混線ノイズ", attackScope: "allSmall" }] },
-      { title: "第17戦 チアガール手ぶくろ強化", drop: "チアガール手ぶくろ強化", enemies: [{ name: "チアガール手ぶくろ", hp: 455, atk: 29, color: "#f7a8c8", kind: "speaker", attackName: "応援ノイズ", attackScope: "allSmall" }, { name: "沈黙ミニドラ", hp: 380, atk: 27, color: "#b993ff", kind: "note", attackName: "しーんショック" }] },
-      { title: "第18戦 コエカタマリン強化", drop: "コエカタマリン強化", lines: [
-        { speaker: "ドラえもん", text: "コエカタマリンはもう回収している。でも、声を固める力がさらに強くなろうとしている。" },
+        { speaker: "ウルトラスーパーデラックス錠", text: "ウルトラスーパーデラックス！ 3ターンだけ、ぼくは止まらない！" }
+      ], enemies: [{ name: "ウルトラスーパーデラックス錠", hp: 9999, atk: 60, fixedDamage: 60, color: "#ffcd5a", kind: "speaker", attackName: "ウルトラスーパーデラックス！", attackScope: "allFixed", immortal: true, vanishAfterTurns: 3 }] },
+      { title: "第12戦 三つの道具強化試練", drop: ["どこでもドア強化", "空気砲強化", "グルメテーブル掛け強化"], lines: [
+        { speaker: "ドラえもん", text: "どこでもドア、空気砲、グルメテーブル掛けが同時に反応している。まとめて力を引き出す試練だ。" },
+        { speaker: "のび太", text: "三ついっぺんに！？ でもここを越えれば、ぼくの空気砲ももっと強くなるんだよね。" },
+        { speaker: "どこでもドア", text: "逃げ道も、攻撃も、回復も。全部使いこなせるか見せてみろ！" }
+      ], enemies: [{ name: "どこでもドア", hp: 180, atk: 20, fixedDamage: 20, color: "#47b8ec", kind: "mirror", attackName: "逆襲", attackEffect: "stun", actionsPerTurn: 3 }, { name: "空気砲", hp: 310, atk: 50, fixedDamage: 50, color: "#ff884e", kind: "air", attackName: "逆襲" }, { name: "グルメテーブル掛け", hp: 220, atk: 0, color: "#f08cb4", kind: "mist", attackName: "ごちそう補給", healAttackName: "ごちそう補給", healAllies: true, healAmount: 50 }] },
+      { title: "第13戦 四つの道具強化試練", drop: ["名刀電光丸", "名刀電光丸強化", "ヒラリマント強化", "チアガール手ぶくろ強化", "コエカタマリン強化"], lines: [
+        { speaker: "ドラえもん", text: "今度は電光丸、ヒラリマント、チアガール手ぶくろ、コエカタマリンが一気に試練を出してきた。" },
         { speaker: "ジャイアン", text: "俺様の声をもっと強くする試練ってことか。いいぜ、受けて立つ！" },
-        { speaker: "コエカタマリン", text: "新たな力を引き出す試練だ。声の塊を受け止めてみろ！" }
-      ], enemies: [{ name: "コエカタマリン", hp: 500, atk: 30, fixedDamage: 30, color: "#e46255", kind: "mic", attackName: "強化音塊ショット", attackScope: "allFixed" }, { name: "覚醒ミニドラ", hp: 360, atk: 26, color: "#ffcd5a", kind: "speaker", attackName: "覚醒スパーク" }] },
-      { title: "第19戦 出木杉君とミニドラ2体", lines: [
+        { speaker: "名刀電光丸", text: "守る力、返す力、支える力、響かせる力。全部まとめて示してみろ。" }
+      ], enemies: [{ name: "名刀電光丸", hp: 250, atk: 50, fixedDamage: 50, color: "#65e2ff", kind: "note", attackName: "電光斬り", attackPattern: "denkomaru" }, { name: "強化ヒラリマント", hp: 198, atk: 27, color: "#7edfd2", kind: "mirror", attackName: "強化ひらり反撃", counterRate: 1 }, { name: "チアガール手ぶくろ", hp: 150, atk: 0, color: "#f7a8c8", kind: "speaker", attackName: "応援回復", healAttackName: "応援回復", healAllies: true, healAmount: 30 }, { name: "コエカタマリン", hp: 200, atk: 30, fixedDamage: 30, color: "#e46255", kind: "mic", attackName: "強化音塊ショット", attackScope: "allFixed" }] },
+      { title: "第14戦 出木杉君とミニドラ2体", lines: [
         { speaker: "出木杉君", text: "道具に感情があるなら、もっと合理的に世界を直せるはずなんだ。" },
         { speaker: "のび太", text: "そんなの、みんなを操ってやることじゃないよ！" },
         { speaker: "ドラえもん", text: "王者の理論に気をつけて。単体大ダメージに行動不能までついてくる。" },
         { speaker: "出木杉君", text: "では証明しよう。君たちの判断より、僕の理論が上だと。" }
       ], enemies: [{ name: "秩序のミニドラ", hp: 100, atk: 20, fixedDamage: 20, color: "#65e2ff", kind: "note", attackName: "無力化", attackEffect: "weak", summonedBy: "出木杉君" }, { name: "出木杉君", hp: 500, atk: 30, fixedDamage: 30, color: "#b993ff", kind: "mirror", boss: true, attackName: "王者の理論", attackEffect: "stun", summonsMiniDora: true }, { name: "秩序のミニドラ", hp: 100, atk: 20, fixedDamage: 20, color: "#65e2ff", kind: "note", attackName: "無力化", attackEffect: "weak", summonedBy: "出木杉君" }] },
-      { title: "第20戦 ドラミとセワシ", boss: true, lines: [
+      { title: "第15戦 ドラミとセワシ", boss: true, lines: [
         { speaker: "暴君ドラミ", text: "あーあ、出木杉さんやられちゃった。" },
         { speaker: "セワシ", text: "期待はしてなかったけどね。" },
         { speaker: "ドラえもん", text: "ドラミ！ お前まで操られていたのか！" },
         { speaker: "暴君ドラミ", text: "ふふっ ポンコツなお兄ちゃんはここでお役御免よ！" }
-      ], enemies: [{ name: "暴君ドラミ", hp: 1000, atk: 40, fixedDamage: 40, color: "#ffd65d", catVariant: true, catColor: "#ffd24f", accessory: "ribbon", boss: true, attackName: "ドラミパンチ", attackPattern: "dorami" }, { name: "セワシ", hp: 200, atk: 20, fixedDamage: 20, color: "#65e2ff", kind: "note", attackName: "未来ショック", supportFor: "暴君ドラミ", healAmount: 100 }] },
-      { title: "第21戦 ドラえもんズ", boss: true, secret: true, lines: [
+      ], enemies: [{ name: "暴君ドラミ", hp: 300, atk: 40, fixedDamage: 40, color: "#ffd65d", catVariant: true, catColor: "#ffd24f", accessory: "ribbon", boss: true, attackName: "ドラミパンチ", attackPattern: "dorami" }, { name: "セワシ", hp: 700, atk: 20, fixedDamage: 20, color: "#65e2ff", kind: "note", attackName: "未来ショック", supportFor: "暴君ドラミ", healAmount: 100, reviveSupport: true }] },
+      { title: "第16戦 ドラえもんズ", boss: true, secret: true, lines: [
         { speaker: "ドラ・ザ・キッド", text: "やるなあお前ら！" },
         { speaker: "王ドラ", text: "俺たち最後の壁を越えられるかな！？" },
         { speaker: "ドラえもん", text: "ドラえもんズまで……でも、ここまで無敗で来たんだ。最後まで行こう！" }
@@ -1572,7 +1594,7 @@
         { name: "ドラ・ザ・キッド", hp: 200, atk: 50, fixedDamage: 50, catVariant: true, catColor: "#ffd65d", accessory: "borsalino", attackName: "空気砲ドカン！" },
         { name: "王ドラ", hp: 150, atk: 16, fixedDamage: 16, attackScope: "allFixed", catVariant: true, catColor: "#ff9f3d", accessory: "chinese", attackName: "あちょー" },
         { name: "エル・マタドーラ", hp: 300, atk: 0, fixedDamage: 0, matadoraGuard: true, catVariant: true, catColor: "#e84032", accessory: "horns", attackName: "ヒラリマント！" },
-        { name: "ドラニコフ", hp: 200, atk: 11, fixedDamage: 11, hits: 3, catVariant: true, catColor: "#ff9f3d", accessory: "wolf", attackName: "ガウ！" },
+        { name: "ドラニコフ", hp: 100, atk: 22, fixedDamage: 22, hits: 3, catVariant: true, catColor: "#ff9f3d", accessory: "wolf", attackName: "ガウ！" },
         { name: "ドラリーニョ", hp: 150, atk: 0, fixedDamage: 0, attackEffect: "stun", catVariant: true, catColor: "#3fbd5d", accessory: "goldWhisker", attackName: "サッカーしようよ！" },
         { name: "ドラメッドⅢ世", hp: 200, atk: 0, fixedDamage: 0, attackEffect: "mpHalf", catVariant: true, catColor: "#7b67d8", accessory: "chinese", attackName: "魔法であ～る" }
       ] }
@@ -1720,10 +1742,10 @@
         state.guard = 0;
         state.actedThisRound = [];
         state.pendingTarget = null;
-        state.log = `${aliveHero().name}の番。味方を切り替えて技を選ぼう。`;
+        state.log = "敵の先制攻撃！";
         el.advance.textContent = "オート";
-        el.story.innerHTML = `<span class="story-speaker">戦闘</span><div class="story-text">${chapters[state.chapter].title}</div><div class="story-next">下のコマンドで行動</div>`;
-        render();
+        el.story.innerHTML = `<span class="story-speaker">戦闘</span><div class="story-text">${chapters[state.chapter].title}</div><div class="story-next">敵の先制攻撃！</div>`;
+        startPreemptiveEnemyPhase();
         saveGame();
         return;
       }
@@ -2122,6 +2144,16 @@
       }, 650);
     }
 
+    function startPreemptiveEnemyPhase() {
+      state.stunnedHeroIds = [];
+      state.phase = "enemy";
+      render();
+      setTimeout(() => {
+        showTurnBanner("敵の先制攻撃！");
+        setTimeout(enemyTurn, 980);
+      }, 650);
+    }
+
     function hitEnemy(base, text, chosenEnemy) {
       const enemy = chosenEnemy || targetEnemy();
       if (!enemy) return;
@@ -2137,6 +2169,12 @@
         state.log = `${enemy.name}には攻撃が通らない。`;
         return;
       }
+      if (enemy.tempInvincibleTurns > 0) {
+        flashUnit(enemy.name, "heal");
+        popupUnit(enemy.name, "無敵", "heal");
+        state.log = `${enemy.name}は電光丸で身を守っている。攻撃が通らない。`;
+        return;
+      }
       const guardRate = damageGuardRate(enemy);
       const damage = Math.max(4, Math.floor((base + state.partyBuff + random(-3, 4)) * consumeDamageMultiplier() * guardRate));
       enemy.hp -= damage;
@@ -2147,6 +2185,49 @@
       if (enemy.hp > 0 && enemy.counterRate > 0) {
         const hero = aliveHero();
         const counter = Math.max(1, Math.floor(damage * enemy.counterRate));
+        popupUnit(enemy.name, "ひらり！", "warn");
+        hero.hp -= counter;
+        flashUnit(hero.id, "hit");
+        popupUnit(hero.id, counter, "bad");
+        state.log += ` ${enemy.name}が受け流して${counter}ダメージを返した。`;
+      }
+    }
+
+    function randomSuperGloveHits() {
+      const roll = Math.random();
+      if (roll < 0.05) return 1;
+      if (roll < 0.10) return 2;
+      if (roll < 0.40) return 3;
+      if (roll < 0.70) return 4;
+      return 5;
+    }
+
+    function superGloveAttack(chosenEnemy) {
+      const enemy = chosenEnemy || targetEnemy();
+      if (!enemy) return;
+      if (enemy.evasionRate && Math.random() < enemy.evasionRate) {
+        flashUnit(enemy.name, "attack");
+        popupUnit(enemy.name, "回避", "heal");
+        state.log = `${enemy.name}はひらりと回避した。`;
+        return;
+      }
+      if (enemy.immortal || enemy.tempInvincibleTurns > 0) {
+        flashUnit(enemy.name, "heal");
+        popupUnit(enemy.name, "無敵", "heal");
+        state.log = `${enemy.name}にはスーパー手袋が通らない。`;
+        return;
+      }
+      const hits = randomSuperGloveHits();
+      const guardRate = damageGuardRate(enemy);
+      const damage = Math.max(1, Math.floor((20 + state.partyBuff) * consumeDamageMultiplier() * guardRate));
+      enemy.hp -= damage * hits;
+      flashUnit(enemy.name, "hit");
+      popupUnit(enemy.name, `${damage}×${hits}`, "bad");
+      state.log = `ジャイアンがスーパー手袋で連打した。${enemy.name}に${damage}×${hits}ダメージ。`;
+      if (guardRate < 1) state.log += " エル・マタドーラのヒラリマントでダメージが半減。";
+      if (enemy.hp > 0 && enemy.counterRate > 0) {
+        const hero = aliveHero();
+        const counter = Math.max(1, Math.floor(damage * hits * enemy.counterRate));
         popupUnit(enemy.name, "ひらり！", "warn");
         hero.hp -= counter;
         flashUnit(hero.id, "hit");
@@ -2177,6 +2258,10 @@
             return;
           }
           if (enemy.immortal) {
+            popupUnit(enemy.name, "無敵", "heal");
+            return;
+          }
+          if (enemy.tempInvincibleTurns > 0) {
             popupUnit(enemy.name, "無敵", "heal");
             return;
           }
@@ -2463,6 +2548,19 @@
           ? { name: enemy.attackName || "逆襲", scope: "allFixed", damage: 20 }
           : { name: enemy.attackName || "逆襲", scope: "allFixed", damage: 25 };
       }
+      if (enemy.attackPattern === "dressCamera") {
+        return Math.random() < 0.5
+          ? { name: enemy.attackName || "まぶしいフラッシュ", scope: "allFixed", damage: 10 }
+          : { name: enemy.attackName || "まぶしいフラッシュ", scope: "allFixed", damage: 20 };
+      }
+      if (enemy.attackPattern === "denkomaru") {
+        return Math.random() < 0.5
+          ? { name: enemy.attackName || "電光斬り", scope: "single", damage: 50 }
+          : { name: "電光防御", scope: "self", damage: 0, effect: "selfInvincible" };
+      }
+      if (enemy.attackPattern === "superGlove") {
+        return { name: enemy.attackName || "スーパー殴打", scope: "single", damage: 20, hits: randomSuperGloveHits() };
+      }
       return {
         name: enemy.attackName || enemy.attackText || "逆襲",
         scope: enemy.attackScope || "single",
@@ -2510,7 +2608,12 @@
           .filter((target) => target.name.includes(enemy.healTargetIncludes) && target.hp > 0 && target.hp < target.maxHp)
           .sort((a, b) => (a.hp / a.maxHp) - (b.hp / b.maxHp))[0];
       }
-      if (enemy.supportFor) return state.enemies.find((target) => target.name === enemy.supportFor && target.hp > 0);
+      if (enemy.healAllies) {
+        return state.enemies
+          .filter((target) => target !== enemy && target.hp > 0 && target.hp < target.maxHp)
+          .sort((a, b) => (a.hp / a.maxHp) - (b.hp / b.maxHp))[0];
+      }
+      if (enemy.supportFor) return state.enemies.find((target) => target.name === enemy.supportFor && (target.hp > 0 || enemy.reviveSupport));
       return null;
     }
 
@@ -2530,7 +2633,7 @@
       enemy.vanishTurns = (enemy.vanishTurns ?? enemy.vanishAfterTurns) - 1;
       if (enemy.vanishTurns <= 0) {
         enemy.hp = 0;
-        state.log = `${enemy.name}は${attackName}を放った。味方全体に${damage}ダメージ。5ターンの無敵が切れて消滅した。`;
+        state.log = `${enemy.name}は${attackName}を放った。味方全体に${damage}ダメージ。${enemy.vanishAfterTurns}ターンの無敵が切れて消滅した。`;
         popupUnit(enemy.name, "消滅", "bad");
       } else {
         state.log = `${enemy.name}は${attackName}を放った。味方全体に${damage}ダメージ。消滅まで残り${enemy.vanishTurns}ターン。`;
@@ -2576,21 +2679,22 @@
           popupUnit(other.name, selfDamage, "bad");
           continue;
         }
-        if (enemy.supportFor || enemy.healTargetIncludes) {
+        if (enemy.supportFor || enemy.healTargetIncludes || enemy.healAllies) {
           const supportTarget = supportHealTarget(enemy);
-          const shouldHeal = enemy.healTargetIncludes ? !!supportTarget : (supportTarget && Math.random() < 0.55);
+          const shouldHeal = enemy.healTargetIncludes || enemy.healAllies ? !!supportTarget : (supportTarget && Math.random() < 0.55);
           if (shouldHeal) {
             const attackName = enemy.healAttackName || `ドラミを直す`;
             await telegraphEnemyAttack(enemy, attackName);
-            supportTarget.hp = Math.min(supportTarget.maxHp, supportTarget.hp + enemy.healAmount);
+            const wasDown = supportTarget.hp <= 0;
+            supportTarget.hp = Math.min(supportTarget.maxHp, Math.max(0, supportTarget.hp) + enemy.healAmount);
             flashUnit(supportTarget.name, "heal");
-            popupUnit(supportTarget.name, `+${enemy.healAmount}`, "heal");
-            state.log = `${enemy.name}は${attackName}。${supportTarget.name}を${enemy.healAmount}回復。`;
+            popupUnit(supportTarget.name, wasDown ? "復活" : `+${enemy.healAmount}`, "heal");
+            state.log = `${enemy.name}は${attackName}。${supportTarget.name}を${wasDown ? "復活させて" : ""}${enemy.healAmount}回復。`;
             render();
             await wait(260);
             continue;
           }
-          if (enemy.healTargetIncludes) {
+          if (enemy.healTargetIncludes || enemy.healAllies) {
             state.log = `${enemy.name}は診察相手を探している。`;
             render();
             await wait(160);
@@ -2610,6 +2714,14 @@
           render();
           await wait(260);
           await explainSecretEnemySkill(enemy, secretEnemyEffectText(enemy, action));
+          continue;
+        }
+        if (action.effect === "selfInvincible") {
+          enemy.tempInvincibleTurns = 2;
+          popupUnit(enemy.name, "無敵", "heal");
+          state.log = `${enemy.name}は${attackName}。1ターン無敵になった。`;
+          render();
+          await wait(260);
           continue;
         }
         const activeTargets = joinedHeroes().filter((hero) => hero.hp > 0 && !isHeroHidden(hero));
@@ -2679,7 +2791,7 @@
         const cut = state.damageCutTurns > 0 ? (1 - state.damageCutRate) : 1;
         const baseDamage = action.damage ?? enemy.atk;
         const damage = Math.max(0, Math.floor((baseDamage - state.enemyDebuff - state.guard + (action.damage === null ? random(-2, 3) : 0)) * state.enemyAttackMultiplier * cut));
-        const hits = enemy.hits || 1;
+        const hits = action.hits || enemy.hits || 1;
         if (damage > 0) target.hp -= damage * hits;
         state.log = `${enemy.name}は${attackName}。${target.name}に${damage}${hits > 1 ? `×${hits}` : ""}ダメージ。`;
         if (state.damageCutTurns > 0) state.log += " 着せ替えカメラで軽減。";
@@ -2720,6 +2832,9 @@
       state.enemyAttackMultiplier = 1;
       state.counterHeroId = null;
       state.counterRate = 0;
+      state.enemies.forEach((enemy) => {
+        if (enemy.tempInvincibleTurns > 0) enemy.tempInvincibleTurns -= 1;
+      });
       if (state.enemies.every((enemy) => enemy.hp <= 0)) {
         setTimeout(victory, 720);
         render();
@@ -2783,11 +2898,11 @@
       state.rewinding = false;
       state.phase = "battle";
       state.active = heroes.findIndex((hero) => isJoined(hero) && hero.hp > 0);
-      state.log = "この戦闘を最初からやり直す。HPとMPは満タン。";
-      el.story.innerHTML = `<span class="story-speaker">再戦</span><div class="story-text">${chapter.title}を最初からやり直す。HPとMPは全回復。</div><div class="story-next">下のコマンドで再戦</div>`;
+      state.log = "この戦闘を最初からやり直す。HPとMPは満タン。敵の先制攻撃！";
+      el.story.innerHTML = `<span class="story-speaker">再戦</span><div class="story-text">${chapter.title}を最初からやり直す。HPとMPは全回復。</div><div class="story-next">敵の先制攻撃！</div>`;
       el.advance.textContent = "オート";
       el.rewind.classList.remove("show", "rewinding");
-      render();
+      startPreemptiveEnemyPhase();
       saveGame();
     }
 
@@ -3042,7 +3157,7 @@
         const heroIndex = heroes.indexOf(hero);
         const style = hero.shirt ? `style="--shirt:${hero.shirt}"` : "";
         const allyTargetable = isTargetableHero(hero);
-        const cls = ["unit", hero.cat ? "cat" : "person", hero.avatar || "", heroIndex === state.active && state.phase === "battle" ? "active" : "", isHeroHidden(hero) ? "hidden" : "", state.weakenedHeroIds.includes(hero.id) ? "shrunk" : "", hero.hp <= 0 ? "down" : "", allyTargetable ? "targetable" : "", isChosenTarget(hero) ? "chosen-target" : ""].join(" ");
+        const cls = ["unit", hero.cat ? "cat" : "person", hero.avatar || "", heroIndex === state.active && state.phase === "battle" ? "active" : "", isHeroHidden(hero) ? "hidden" : "", state.weakenedHeroIds.includes(hero.id) ? "shrunk" : "", isHeroStunned(hero) ? "stopped" : "", hero.hp <= 0 ? "down" : "", allyTargetable ? "targetable" : "", isChosenTarget(hero) ? "chosen-target" : ""].join(" ");
         return `<div class="${cls}" data-unit="${hero.id}" ${allyTargetable ? `data-ally-target="${heroIndex}"` : ""} ${style}>${heroAvatar(hero)}<div class="nameplate">${hero.name}</div></div>`;
       }).join("");
       document.querySelectorAll("[data-ally-target]").forEach((node) => {
@@ -3092,15 +3207,15 @@
         const enemyTargetable = isTargetableEnemy(enemy);
         if (enemy.heroId) {
           const hero = heroes.find((member) => member.id === enemy.heroId);
-          const cls = ["unit", hero?.cat ? "cat" : "person", hero?.avatar || "", enemy.hp <= 0 ? "down" : "", enemyTargetable ? "targetable" : ""].join(" ");
+          const cls = ["unit", hero?.cat ? "cat" : "person", hero?.avatar || "", enemy.stopped > 0 ? "stopped" : "", enemy.hp <= 0 ? "down" : "", enemyTargetable ? "targetable" : ""].join(" ");
           const style = hero?.shirt ? `style="--shirt:${hero.shirt}"` : "";
           return `<div class="${cls}" data-unit="${enemy.name}" ${enemyTargetable ? `data-enemy-target="${index}"` : ""} ${style}>${hpBar}${heroAvatar(hero || {})}<div class="nameplate">${enemy.name}</div></div>`;
         }
         if (enemy.catVariant) {
-          const cls = ["unit", "cat", enemy.boss ? "boss" : "", enemy.hp <= 0 ? "down" : "", enemyTargetable ? "targetable" : ""].join(" ");
+          const cls = ["unit", "cat", enemy.boss ? "boss" : "", enemy.stopped > 0 ? "stopped" : "", enemy.hp <= 0 ? "down" : "", enemyTargetable ? "targetable" : ""].join(" ");
           return `<div class="${cls}" data-unit="${enemy.name}" ${enemyTargetable ? `data-enemy-target="${index}"` : ""} style="--cat-color:${enemy.catColor || enemy.color || "#22a5e3"}">${hpBar}${heroAvatar({ cat: true, accessory: enemy.accessory, miniDora: enemy.miniDora })}<div class="nameplate">${enemy.name}</div></div>`;
         }
-        const cls = ["unit", "gadget", enemy.boss ? "boss" : "", enemy.hp <= 0 ? "down" : "", enemyTargetable ? "targetable" : ""].join(" ");
+        const cls = ["unit", "gadget", enemy.boss ? "boss" : "", enemy.stopped > 0 ? "stopped" : "", enemy.hp <= 0 ? "down" : "", enemyTargetable ? "targetable" : ""].join(" ");
         return `<div class="${cls}" data-unit="${enemy.name}" ${enemyTargetable ? `data-enemy-target="${index}"` : ""} style="--gadget:${enemy.color}">${hpBar}<div class="avatar gadget-art ${enemy.kind || "air"}">${gadgetMarkup(enemy.kind)}</div><div class="nameplate">${enemy.name}</div></div>`;
       }).join("");
       document.querySelectorAll("[data-enemy-target]").forEach((node) => {
