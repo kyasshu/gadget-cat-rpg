@@ -1587,11 +1587,11 @@
       ], enemies: [{ name: "操られしジャイアン", hp: 100, atk: 20, fixedDamage: 20, color: "#e0664d", kind: "mic", heroId: "gouta", attackName: "ぶっ飛ばすデンジャラス", attackText: "コエカタマリンで小さな範囲攻撃を放った", attackScope: "allFixed" }, { name: "コエカタマリン", hp: 165, atk: 20, fixedDamage: 20, color: "#e46255", kind: "mic", attackName: "音塊ショット", attackText: "固まった声をぶつけた" }] },
       { title: "第8戦 スーパー手袋", drop: "スーパー手袋", lines: [
         { speaker: "ジャイアン", text: "なんだあの手袋、俺様より先に暴れるつもりか。いい度胸じゃねえか。" },
-        { speaker: "スネ夫", text: "ジャイアン、張り合わないでよ！ あれ、当たったら何回殴られるか分からないんだよ！" },
-        { speaker: "のび太", text: "一回でもいやなのに、五回なんて聞いただけで足がふるえるよ。" },
-        { speaker: "ドラえもん", text: "スーパー手袋は連続で殴ってくる。回数が少ない時もあるけど、油断したら一気に崩されるぞ。" },
-        { speaker: "スーパー手袋", text: "力を使うなら、受け止める覚悟も持て。さあ、何発まで耐えられる？" }
-      ], enemies: [{ name: "スーパー手袋", hp: 220, atk: 20, fixedDamage: 20, color: "#e46255", kind: "air", attackName: "スーパー殴打", attackPattern: "superGlove" }, { name: "奔走ミニドラ", hp: 100, atk: 10, fixedDamage: 10, color: "#d4c2ff", kind: "mist", attackName: "走り回り", attackScope: "allFixed" }, { name: "奔走ミニドラ", hp: 100, atk: 10, fixedDamage: 10, color: "#d4c2ff", kind: "mist", attackName: "走り回り", attackScope: "allFixed" }] },
+        { speaker: "スネ夫", text: "ジャイアン、張り合わないでよ！ あれ、狙いを散らしてくるから誰が殴られるか分からないんだよ！" },
+        { speaker: "のび太", text: "一人で受けるのもいやだけど、みんなに飛んでくるのも怖いよ。" },
+        { speaker: "ドラえもん", text: "スーパー手袋は30ダメージを3回、ランダムに割り振ってくる。HPの低い仲間を残すと危ないぞ。" },
+        { speaker: "スーパー手袋", text: "力を使うなら、受け止める覚悟も持て。三連打、どこへ飛ぶかな？" }
+      ], enemies: [{ name: "スーパー手袋", hp: 220, atk: 30, fixedDamage: 30, color: "#e46255", kind: "air", attackName: "スーパー殴打", attackPattern: "superGlove" }, { name: "奔走ミニドラ", hp: 100, atk: 10, fixedDamage: 10, color: "#d4c2ff", kind: "mist", attackName: "走り回り", attackScope: "allFixed" }, { name: "奔走ミニドラ", hp: 100, atk: 10, fixedDamage: 10, color: "#d4c2ff", kind: "mist", attackName: "走り回り", attackScope: "allFixed" }] },
       { title: "第9戦 まあまあ棒", drop: "まあまあ棒", lines: [
         { speaker: "スネ夫", text: "まあまあ棒って、本当はけんかを止める道具だよね。なんでこっちを突いてくるのさ。" },
         { speaker: "ドラえもん", text: "怒りを止める力が、強すぎて逆に動きを止める力になっているんだ。" },
@@ -2595,7 +2595,7 @@
           : { name: "電光防御", scope: "self", damage: 0, effect: "selfInvincible" };
       }
       if (enemy.attackPattern === "superGlove") {
-        return { name: enemy.attackName || "スーパー殴打", scope: "single", damage: 20, hits: randomSuperGloveHits() };
+        return { name: enemy.attackName || "スーパー殴打", scope: "randomMulti", damage: 30, hits: 3 };
       }
       return {
         name: enemy.attackName || enemy.attackText || "逆襲",
@@ -2805,6 +2805,39 @@
           await explainSecretEnemySkill(enemy, secretEnemyEffectText(enemy, action, null, damage, 1));
           continue;
         }
+        if (action.scope === "randomMulti") {
+          const hits = action.hits || 3;
+          const cut = state.damageCutTurns > 0 ? (1 - state.damageCutRate) : 1;
+          const baseDamage = action.damage ?? enemy.atk;
+          const damage = Math.max(0, Math.floor((baseDamage - state.enemyDebuff - state.guard + (action.damage === null ? random(-2, 3) : 0)) * state.enemyAttackMultiplier * cut));
+          const hitLogs = [];
+          for (let i = 0; i < hits; i += 1) {
+            const currentTargets = joinedHeroes().filter((hero) => hero.hp > 0 && !isHeroHidden(hero));
+            if (!currentTargets.length) break;
+            const victim = currentTargets[random(0, currentTargets.length - 1)];
+            if (state.evasionBonus > 0 && Math.random() < state.evasionBonus) {
+              popupUnit(victim.id, "回避", "heal");
+              hitLogs.push(`${victim.name}は回避`);
+              continue;
+            }
+            if (damage > 0) victim.hp -= damage;
+            flashUnit(victim.id, "hit");
+            popupUnit(victim.id, damage, "bad");
+            hitLogs.push(`${victim.name}に${damage}`);
+            if (victim.id === state.counterHeroId && state.counterRate > 0) {
+              const counter = Math.max(1, Math.floor(damage * state.counterRate));
+              enemy.hp -= counter;
+              flashUnit(enemy.name, "hit");
+              popupUnit(enemy.name, counter, "bad");
+              hitLogs.push(`反撃${counter}`);
+            }
+          }
+          state.log = `${enemy.name}は${attackName}。${hitLogs.join("、")}。`;
+          if (state.damageCutTurns > 0) state.log += " 着せ替えカメラで軽減。";
+          render();
+          await wait(260);
+          continue;
+        }
         const target = activeTargets[random(0, activeTargets.length - 1)];
         if (action.effect === "mpHalf") {
           const before = target.mp;
@@ -2984,6 +3017,8 @@
       if (chapter.boss && !chapter.secret && state.defeatCount === 0 && chapters[state.chapter + 1]?.secret) {
         state.chapter += 1;
         state.lastReward = "戦闘不能なしでここまで来た。？？？「相手をしてやるよ！」 秘密の最後の壁が開いた。";
+        const revived = reviveDownedPartyAtOne();
+        if (revived) state.lastReward += " 倒れていた味方はHP1で立ち上がった。";
         startChapter();
         el.log.textContent = state.log;
       } else if (chapter.boss) {
@@ -3010,11 +3045,24 @@
         state.lastReward = rewardParts.length
           ? rewardParts.join(" ")
           : `${chapter.title}を突破した。息を整えて次へ進もう。`;
+        const revived = reviveDownedPartyAtOne();
+        if (revived) state.lastReward += " 倒れていた味方はHP1で立ち上がった。";
         startChapter();
         el.log.textContent = state.log;
       }
       render();
       updateTitleState();
+    }
+
+    function reviveDownedPartyAtOne() {
+      let revived = 0;
+      joinedHeroes().forEach((hero) => {
+        if (hero.hp <= 0) {
+          hero.hp = 1;
+          revived += 1;
+        }
+      });
+      return revived;
     }
 
     function clearRank() {
